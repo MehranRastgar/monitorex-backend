@@ -11,6 +11,7 @@ import {
   Res,
   HttpStatus,
   Response,
+  Delete,
 } from '@nestjs/common';
 import { CreateSensorDto } from './dto/CreateSensor.dto';
 import { SensorsService } from './sensors.service';
@@ -42,10 +43,32 @@ export class SensorsController {
 
   @Post('/rec')
   async insertRecord(@Body() sensorData) {
-    const result = await this.sensorsService.addRecorSeries(
+    const result = await this.sensorsService.addRecordSeries(
       sensorData.id,
       sensorData.value,
     );
     return result;
+  }
+  @Post('/fake')
+  async fakeRec(@Body() sensorData) {
+    const result = await this.sensorsService.makeFakeData(
+      'minute',
+      sensorData.id,
+      sensorData.fromDate,
+      sensorData.toDate,
+    );
+    return result;
+  }
+
+  // @Get('/sensor/:id')
+  // async getSensorChartReport(@Query() Query) {
+  //   return 'result';
+  // }
+
+  @Get('/rec/delete')
+  async deleteRecordById(@Query() Query) {
+    console.log(Query.id);
+    // const result = await this.sensorsService.removeTimeSeriesById(Query.id);
+    return Query.id;
   }
 }

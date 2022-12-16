@@ -20,7 +20,7 @@ export const SensorSchema = new mongoose.Schema(
 );
 export const sensorseries = new mongoose.Schema({
   timestamp: mongoose.Schema.Types.Date,
-  metadata: {
+  metaField: {
     sensorId: mongoose.Schema.Types.ObjectId,
     incremental: Number,
     value: Number,
@@ -75,7 +75,7 @@ export interface Sensor {
 export interface sensorseries {
   timestamp: mongotimeseries.date;
   target: typeof mongotimeseries;
-  metadata: {
+  metaField: {
     sensorId: mongoose.Schema.Types.ObjectId;
     incremental: number;
     value: number;
