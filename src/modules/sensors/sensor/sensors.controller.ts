@@ -13,6 +13,7 @@ import {
   Response,
   Delete,
 } from '@nestjs/common';
+import { ParsedUrlQuery } from 'querystring';
 import { CreateSensorDto } from './dto/CreateSensor.dto';
 import { SensorsService } from './sensors.service';
 
@@ -20,8 +21,8 @@ import { SensorsService } from './sensors.service';
 export class SensorsController {
   constructor(private sensorsService: SensorsService) {}
   @Get('/')
-  async getAllSensors(@Query() getData: any) {
-    return await this.sensorsService.getAllSensors(Number(getData?.limit));
+  async getAllSensors(@Query() query: ParsedUrlQuery) {
+    return await this.sensorsService.getAllSensors(query);
   }
   @Post('/')
   @HttpCode(201)
@@ -60,15 +61,14 @@ export class SensorsController {
     return result;
   }
 
-  // @Get('/sensor/:id')
-  // async getSensorChartReport(@Query() Query) {
-  //   return 'result';
-  // }
-
-  @Get('/rec/delete')
+  @Get('/sensor/:id')
+  async getSensorChartReport(@Param() param) {
+    return param?.id ?? 'no';
+  }
+  @Delete('/rec/delete')
   async deleteRecordById(@Query() Query) {
     console.log(Query.id);
-    // const result = await this.sensorsService.removeTimeSeriesById(Query.id);
-    return Query.id;
+    const result = await this.sensorsService.removeTimeSeriesById(Query.id);
+    return result;
   }
 }

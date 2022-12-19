@@ -1,6 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import mongoose, { Model, Number } from 'mongoose';
+import { ParsedUrlQuery } from 'querystring';
+import { order, sort } from '../interface';
 import { Sensor, sensorseries } from './sensor.model';
 // import * as SerialPort from 'serialport';
 
@@ -36,9 +38,28 @@ export class SensorsService {
       return 'err:' + JSON.stringify(err);
     }
   }
-  async getAllSensors(limit?: number) {
-    if (typeof limit === undefined) limit = 20;
-    const findedSensors = await this.sensorModel.find().limit(limit);
+  async getAllSensors(query: ParsedUrlQuery) {
+    // if (typeof limit === undefined) limit = 20;
+    // const sortType: = query?.sorttype == "desc" ? 1 : -1;
+    const textObject: any = query?.q
+      ? {
+          $text: {
+            $search: query?.q,
+            $diacriticSensitive: false,
+            $caseSensitive: false,
+          },
+        }
+      : {};
+    const order: order = query?.order === 'asc' ? 'asc' : 'desc';
+    const sort: sort = query?.sort;
+    const perPageLimit = Number(query?.perpage ?? 20);
+    const PageNumber = Number(query?.page ?? 1);
+    const sortArray: any[] = [[sort, order === 'asc' ? 1 : -1]];
+    const findedSensors = await this.sensorModel
+      .find(textObject)
+      .limit(perPageLimit)
+      .skip(PageNumber)
+      .sort(sortArray);
     return findedSensors;
   }
 

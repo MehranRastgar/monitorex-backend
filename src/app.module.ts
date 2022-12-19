@@ -7,12 +7,14 @@ import { Database } from './database/database';
 import { MongooseModule } from '@nestjs/mongoose';
 import { SensorsService } from './modules/sensors/sensor/sensors.service';
 import { SensorsModule } from './modules/sensors/sensor/sensors.module';
+import { DevicesModule } from './modules/devices/devices.module';
 
 @Module({
   imports: [
     QuizModule,
     MongooseModule.forRoot('mongodb://root:password@localhost:27018'),
     SensorsModule,
+    DevicesModule,
   ],
   controllers: [AppController],
   providers: [AppService, Database],
