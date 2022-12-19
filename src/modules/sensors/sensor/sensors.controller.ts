@@ -39,7 +39,7 @@ export class SensorsController {
   @Post('/rec')
   async insertRecord(@Body() sensorData) {
     const result = await this.sensorsService.addRecordSeries(
-      sensorData.id,
+      sensorData.id.toString(),
       sensorData.value,
     );
     return result;

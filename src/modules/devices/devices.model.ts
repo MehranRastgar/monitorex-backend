@@ -4,7 +4,7 @@ const deviceAddress = new mongoose.Schema({
   multiPort: {
     type: Number,
     required: true,
-    validator: { $gte: 1, $lte: 255 },
+    validator: { $gte: 1, $lte: 16 },
   },
   sMultiPort: {
     type: Number,
@@ -19,6 +19,7 @@ const factorsSchema = new mongoose.Schema({
     required: true,
     enum: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12, 13, 14, 15, 16],
   },
+  factorValue: { type: Number, required: true },
 });
 
 export const DeviceSchema = new mongoose.Schema(
@@ -64,6 +65,7 @@ export interface factors {
     | 14
     | 15
     | 16;
+  factorValue: number;
 }
 export interface deviceAddress {
   multiPort: number;

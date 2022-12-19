@@ -8,14 +8,15 @@ export const SensorSchema = new mongoose.Schema(
       ref: 'Device',
       autopopulate: true,
     },
-    title: { type: String, require: true },
-    multiport: { type: Number, require: true },
-    superMultiport: { type: Number, require: true },
-    type: { type: String, require: true },
-    unit: { type: String, require: true },
+    title: { type: String, required: true },
+    superMultiport: { type: Number, required: true },
+    multiport: { type: Number, required: true },
+    port: { type: Number, required: true },
+    type: { type: String, required: true },
+    unit: { type: String, required: true },
     sensorUniqueName: {
       type: String,
-      require: true,
+      required: true,
       unique: true,
       validator: true,
     },
@@ -26,7 +27,7 @@ export const SensorSchema = new mongoose.Schema(
 export const sensorseries = new mongoose.Schema({
   timestamp: mongoose.Schema.Types.Date,
   metaField: {
-    sensorId: mongoose.Schema.Types.ObjectId,
+    sensorUnique: String,
     incremental: Number,
     value: Number,
     max: Number,
@@ -70,8 +71,9 @@ export const sensorseries = new mongoose.Schema({
 export interface Sensor {
   deviceId: mongoose.Schema.Types.ObjectId;
   title: string;
-  multiport: number;
   superMultiport: number;
+  multiport: number;
+  port: number;
   type: string;
   unit: string;
   sensorUniqueName: string;
@@ -82,7 +84,7 @@ export interface sensorseries {
   timestamp: mongotimeseries.date;
   target: typeof mongotimeseries;
   metaField: {
-    sensorId: mongoose.Schema.Types.ObjectId;
+    sensorUnique: string;
     incremental: number;
     value: number;
     max: number;

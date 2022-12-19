@@ -15,6 +15,7 @@ export class SensorsService {
     @InjectModel('sensorseries')
     private readonly sensorSeriesModel: Model<sensorseries>,
   ) {}
+  //==============================================
   async insertSensor(
     deviceId: string,
     title: string,
@@ -34,6 +35,7 @@ export class SensorsService {
       return 'err:' + JSON.stringify(err);
     }
   }
+  //==============================================
   async getAllSensors(query: ParsedUrlQuery) {
     // if (typeof limit === undefined) limit = 20;
     // const sortType: = query?.sorttype == "desc" ? 1 : -1;
@@ -58,18 +60,20 @@ export class SensorsService {
       .sort(sortArray);
     return findedSensors;
   }
-
+  //==============================================
   setToSecondZero(date: Date) {
     date.setMilliseconds(0);
     date.setSeconds(0);
     return date;
   }
+  //==============================================
   setToMinuteZero(date: Date) {
     date.setMilliseconds(0);
     date.setSeconds(0);
     date.setMinutes(0);
     return date;
   }
+  //==============================================
   setToHourZero(date: Date) {
     date.setMilliseconds(0);
     date.setSeconds(0);
@@ -77,11 +81,11 @@ export class SensorsService {
     date.setHours(0);
     return date;
   }
-
+  //==============================================
   async checkTimeStampWithRsolution(
     resolution: 'hour' | 'minute' | 'second' | undefined,
     DateNow: Date,
-    sensorId: mongoose.Types.ObjectId,
+    sensorUniqueName: string,
   ) {
     try {
       console.log('resolutionresolution', resolution);
@@ -103,16 +107,16 @@ export class SensorsService {
 
         console.log('range', gte, dateLt);
 
-        const iddd = new mongoose.Types.ObjectId(sensorId);
+        // const iddd = new mongoose.Types.ObjectId(sensorId);
         const lastRec = await this.sensorSeriesModel.findOne({
-          'metaField.sensorId': iddd,
+          'metaField.sensorUniqueName': sensorUniqueName,
           timestamp: {
             $lte: new Date(dateLt.toISOString()),
             $gte: new Date(gte.toISOString()),
           },
         });
         console.log('+++> result', lastRec, {
-          'metaField.sensorId': iddd,
+          'metaField.sensorUniqueName': sensorUniqueName,
           timestamp: {
             $lte: new Date(dateLt.toISOString()),
             $gte: new Date(gte.toISOString()),
@@ -149,14 +153,24 @@ export class SensorsService {
       console.log(err);
     }
   }
+  //==============================================
+  async addRecordSeries(sensorUnique: string, value: number) {
+    if (value === 200000) {
+      return {
+        status: 203,
+        message: 'recordIsNotReady',
+      };
+    }
 
-  async addRecordSeries(sensorId: mongoose.Types.ObjectId, value: number) {
+    console.log('sssssssssssss', sensorUnique);
     try {
       const date = new Date();
       const lastRec = await this.sensorSeriesModel
-        .findOne({ 'metaField.sensorId': sensorId })
+        .findOne({ 'metaField.sensorUnique': sensorUnique })
         .sort({ timestamp: -1 });
-      const sensorSettings = await this.sensorModel.findById(sensorId);
+      const sensorSettings = await this.sensorModel.findOne({
+        sensorUniqueName: sensorUnique,
+      });
       let resultCheck = false;
       console.log(sensorSettings);
 
@@ -166,7 +180,7 @@ export class SensorsService {
         resultCheck = await this.checkTimeStampWithRsolution(
           sensorSettings.resolution,
           date,
-          sensorId,
+          sensorUnique,
         );
       }
       console.log(resultCheck);
@@ -175,13 +189,13 @@ export class SensorsService {
         timestamp: date,
         metaField: {
           incremental: (lastRec?.metaField?.incremental ?? 0) + 1,
-          sensorId: sensorId,
+          sensorUnique: sensorUnique,
           value: value,
           average:
             ((lastRec?.metaField?.average ?? value) *
               (lastRec?.metaField?.incremental ?? 0) +
               value) /
-            ((lastRec?.metaField?.incremental ?? 1) + 1),
+            ((lastRec?.metaField?.incremental ?? 0) + 1),
           max:
             value > (lastRec?.metaField?.max ?? value)
               ? value
@@ -209,74 +223,75 @@ export class SensorsService {
       };
     }
   }
+  //==============================================
+  // async addRecordSeriesWithFaketime(
+  //   sensorId: mongoose.Types.ObjectId,
+  //   value: number,
+  //   FakeDate: Date,
+  // ) {
+  //   try {
+  //     const date = FakeDate;
+  //     const lastRec = await this.sensorSeriesModel
+  //       .findOne({ 'metaField.sensorId': sensorId })
+  //       .sort({ timestamp: -1 });
+  //     const sensorSettings = await this.sensorModel.findById(sensorId);
+  //     let resultCheck = false;
+  //     console.log(sensorSettings);
 
-  async addRecordSeriesWithFaketime(
-    sensorId: mongoose.Types.ObjectId,
-    value: number,
-    FakeDate: Date,
-  ) {
-    try {
-      const date = FakeDate;
-      const lastRec = await this.sensorSeriesModel
-        .findOne({ 'metaField.sensorId': sensorId })
-        .sort({ timestamp: -1 });
-      const sensorSettings = await this.sensorModel.findById(sensorId);
-      let resultCheck = false;
-      console.log(sensorSettings);
+  //     if (lastRec === null) {
+  //       resultCheck = true;
+  //     } else {
+  //       resultCheck = await this.checkTimeStampWithRsolution(
+  //         sensorSettings.resolution,
+  //         date,
+  //         sensorId,
+  //       );
+  //     }
+  //     console.log(lastRec);
 
-      if (lastRec === null) {
-        resultCheck = true;
-      } else {
-        resultCheck = await this.checkTimeStampWithRsolution(
-          sensorSettings.resolution,
-          date,
-          sensorId,
-        );
-      }
-      console.log(lastRec);
-
-      const newRecord = new this.sensorSeriesModel({
-        timestamp: date,
-        metaField: {
-          incremental: (lastRec?.metaField?.incremental ?? 0) + 1,
-          sensorId: sensorId,
-          value: value,
-          average:
-            ((lastRec?.metaField?.value ?? value) *
-              (lastRec?.metaField?.incremental ?? 1) +
-              value) /
-            (lastRec?.metaField?.incremental ?? 1),
-          max:
-            value > (lastRec?.metaField?.max ?? value)
-              ? value
-              : lastRec?.metaField?.max ?? value,
-          min:
-            value < (lastRec?.metaField?.min ?? value)
-              ? value
-              : lastRec?.metaField?.min ?? value,
-        },
-      });
-      if (resultCheck === true) {
-        const rec = await newRecord.save();
-        return { status: 201, record: rec, sensor: sensorSettings };
-      } else {
-        return {
-          status: 200,
-          message: 'recordIsDuplicateInResolution',
-          sensor: sensorSettings,
-        };
-      }
-    } catch (err) {
-      return {
-        status: 404,
-        err: JSON.stringify(err) ?? 'sensor id is Not Found',
-      };
-    }
-  }
-
+  //     const newRecord = new this.sensorSeriesModel({
+  //       timestamp: date,
+  //       metaField: {
+  //         incremental: (lastRec?.metaField?.incremental ?? 0) + 1,
+  //         sensorId: sensorId,
+  //         value: value,
+  //         average:
+  //           ((lastRec?.metaField?.value ?? value) *
+  //             (lastRec?.metaField?.incremental ?? 1) +
+  //             value) /
+  //           (lastRec?.metaField?.incremental ?? 1),
+  //         max:
+  //           value > (lastRec?.metaField?.max ?? value)
+  //             ? value
+  //             : lastRec?.metaField?.max ?? value,
+  //         min:
+  //           value < (lastRec?.metaField?.min ?? value)
+  //             ? value
+  //             : lastRec?.metaField?.min ?? value,
+  //       },
+  //     });
+  //     if (resultCheck === true) {
+  //       const rec = await newRecord.save();
+  //       return { status: 201, record: rec, sensor: sensorSettings };
+  //     } else {
+  //       return {
+  //         status: 200,
+  //         message: 'recordIsDuplicateInResolution',
+  //         sensor: sensorSettings,
+  //       };
+  //     }
+  //   } catch (err) {
+  //     return {
+  //       status: 404,
+  //       err: JSON.stringify(err) ?? 'sensor id is Not Found',
+  //     };
+  //   }
+  // }
+  //==============================================
   getRandomArbitrary(min: number, max: number) {
     return Math.random() * (max - min) + min;
   }
+  //==============================================
   async makeFakeData(
     resolution: 'minute' | 'second' | 'hour',
     sensorId: mongoose.Types.ObjectId,
@@ -301,11 +316,11 @@ export class SensorsService {
         Number(fromDate.getTime().toPrecision()) + i * 60000,
       );
       console.log(GoleDate);
-      await this.addRecordSeriesWithFaketime(
-        sensorId,
-        this.getRandomArbitrary(15, 25),
-        GoleDate,
-      );
+      // await this.addRecordSeriesWithFaketime(
+      //   sensorId,
+      //   this.getRandomArbitrary(15, 25),
+      //   GoleDate,
+      // );
     }
     // await this.addRecordSeriesWithFaketime(
     //   sensorId,
@@ -313,12 +328,13 @@ export class SensorsService {
     //   from,
     // );
   }
+  //==============================================
   async removeTimeSeriesById(id: mongoose.Types.ObjectId) {
     const iddd = new mongoose.Types.ObjectId(id);
     return await this.sensorSeriesModel.findByIdAndDelete(iddd);
   }
 }
-
+//==============================================
 // metaField: {
 //   sensorId: ObjectId,
 //   incremental: Number,

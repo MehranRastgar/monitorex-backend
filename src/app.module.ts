@@ -8,6 +8,12 @@ import { MongooseModule } from '@nestjs/mongoose';
 // import { SensorsService } from './modules/sensors/sensor/sensors.service';
 import { SensorsModule } from './modules/sensors/sensor/sensors.module';
 import { DevicesModule } from './modules/devices/devices.module';
+import { SerialModule } from './modules/serial/serial.module';
+import { SensorsService } from './modules/sensors/sensor/sensors.service';
+import {
+  SensorSchema,
+  sensorseries,
+} from './modules/sensors/sensor/sensor.model';
 
 @Module({
   imports: [
@@ -15,8 +21,13 @@ import { DevicesModule } from './modules/devices/devices.module';
     MongooseModule.forRoot('mongodb://root:password@localhost:27018'),
     SensorsModule,
     DevicesModule,
+    SerialModule,
+    MongooseModule.forFeature([
+      { name: 'Sensor', schema: SensorSchema },
+      { name: 'sensorseries', schema: sensorseries },
+    ]),
   ],
   controllers: [AppController],
-  providers: [AppService, Database],
+  providers: [AppService, Database, SensorsService],
 })
 export class AppModule {}
