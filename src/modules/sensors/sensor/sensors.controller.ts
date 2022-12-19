@@ -29,16 +29,10 @@ export class SensorsController {
   @UsePipes(ValidationPipe)
   async insertSensor(@Body() sensorData: CreateSensorDto) {
     return await this.sensorsService.insertSensor(
+      sensorData.deviceId,
       sensorData.title,
-      sensorData.multiport,
-      sensorData.superMultiport,
       sensorData.type,
       sensorData.unit,
-      sensorData.title +
-        '_' +
-        sensorData.multiport.toString() +
-        '_' +
-        sensorData.superMultiport.toString(),
     );
   }
 

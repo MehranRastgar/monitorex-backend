@@ -3,6 +3,11 @@ import * as mongotimeseries from 'mongoose-timeseries';
 
 export const SensorSchema = new mongoose.Schema(
   {
+    deviceId: {
+      type: mongoose.Types.ObjectId,
+      ref: 'Device',
+      autopopulate: true,
+    },
     title: { type: String, require: true },
     multiport: { type: Number, require: true },
     superMultiport: { type: Number, require: true },
@@ -63,6 +68,7 @@ export const sensorseries = new mongoose.Schema({
 // });
 
 export interface Sensor {
+  deviceId: mongoose.Schema.Types.ObjectId;
   title: string;
   multiport: number;
   superMultiport: number;

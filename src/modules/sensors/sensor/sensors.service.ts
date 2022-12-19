@@ -16,20 +16,16 @@ export class SensorsService {
     private readonly sensorSeriesModel: Model<sensorseries>,
   ) {}
   async insertSensor(
+    deviceId: string,
     title: string,
-    multiport: number,
-    superMultiport: number,
     type: string,
     unit: string,
-    sensorUniqueName: string,
   ) {
     const newSensor = new this.sensorModel({
+      deviceId: new mongoose.Types.ObjectId(deviceId),
       title,
-      multiport,
-      superMultiport,
       type,
       unit,
-      sensorUniqueName,
     });
     try {
       const result = await newSensor.save();

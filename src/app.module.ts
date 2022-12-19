@@ -5,7 +5,7 @@ import { QuizModule } from './modules/quiz/quiz.module';
 // import { QuizController } from './modules/quiz/quiz.controller';
 import { Database } from './database/database';
 import { MongooseModule } from '@nestjs/mongoose';
-import { SensorsService } from './modules/sensors/sensor/sensors.service';
+// import { SensorsService } from './modules/sensors/sensor/sensors.service';
 import { SensorsModule } from './modules/sensors/sensor/sensors.module';
 import { DevicesModule } from './modules/devices/devices.module';
 
