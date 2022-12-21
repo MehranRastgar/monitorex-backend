@@ -43,6 +43,15 @@ export const DeviceSchema = new mongoose.Schema(
       validator: true,
       enum: [1, 2, 3, 4, 5, 6, 7, 8],
     },
+    sensors: [
+      {
+        sensorId: {
+          type: mongoose.Types.ObjectId,
+          ref: 'Sensor',
+          autopopulate: true,
+        },
+      },
+    ],
     factors: [factorsSchema],
   },
   { timestamps: true },

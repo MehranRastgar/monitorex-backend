@@ -59,10 +59,22 @@ export class SensorsController {
   async getSensorChartReport(@Param() param) {
     return param?.id ?? 'no';
   }
+  @Get('/sensor/lastrecord/:id')
+  async getLastRecordOfSensor(@Param() param) {
+    const result = await this.sensorsService.getLastRecordOfSeries(param.id);
+    return result;
+  }
   @Delete('/rec/delete')
   async deleteRecordById(@Query() Query) {
     console.log(Query.id);
     const result = await this.sensorsService.removeTimeSeriesById(Query.id);
+    return result;
+  }
+
+  @Get('/sensor/xy/:id')
+  async getXYOfSensor(@Param() param) {
+    console.log(param.id);
+    const result = await this.sensorsService.getXYOfSensorTimeSeries(param.id);
     return result;
   }
 }

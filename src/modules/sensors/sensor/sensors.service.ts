@@ -57,7 +57,9 @@ export class SensorsService {
       .find(textObject)
       .limit(perPageLimit)
       .skip(PageNumber)
-      .sort(sortArray);
+      .sort(sortArray)
+      .populate('sensorLastSerie');
+
     return findedSensors;
   }
   //==============================================
@@ -85,11 +87,9 @@ export class SensorsService {
   async checkTimeStampWithRsolution(
     resolution: 'hour' | 'minute' | 'second' | undefined,
     DateNow: Date,
-    sensorUniqueName: string,
+    sensorId: mongoose.Types.ObjectId,
   ) {
     try {
-      console.log('resolutionresolution', resolution);
-
       if (resolution === 'minute') {
         let dateRef = new Date();
         const dateLt = new Date(
@@ -102,43 +102,19 @@ export class SensorsService {
           0,
         );
         dateRef = this.setToSecondZero(dateRef);
-
         const gte = dateRef;
-
-        console.log('range', gte, dateLt);
-
         // const iddd = new mongoose.Types.ObjectId(sensorId);
         const lastRec = await this.sensorSeriesModel.findOne({
-          'metaField.sensorUniqueName': sensorUniqueName,
+          sensorId: sensorId,
           timestamp: {
             $lte: new Date(dateLt.toISOString()),
             $gte: new Date(gte.toISOString()),
           },
         });
-        console.log('+++> result', lastRec, {
-          'metaField.sensorUniqueName': sensorUniqueName,
-          timestamp: {
-            $lte: new Date(dateLt.toISOString()),
-            $gte: new Date(gte.toISOString()),
-          },
-        });
-        // let lastRecTime = lastRec?.timestamp ?? 0;
-        // lastRecTime !== 0 ? lastRecTime?.setMilliseconds(0) : (lastRecTime = 0);
-        // lastRecTime !== 0 ? lastRecTime?.setSeconds(0) : (lastRecTime = 0);
-        console.log(
-          'TS:+++++==>>>',
-          this.setToSecondZero(new Date(lastRec?.timestamp)),
-          this.setToSecondZero(DateNow),
-        );
 
         if (lastRec === null) {
           return true;
         }
-        console.log(
-          'boolean========',
-          this.setToSecondZero(new Date(lastRec?.timestamp)).toISOString(),
-          this.setToSecondZero(DateNow).toISOString(),
-        );
         if (
           this.setToSecondZero(new Date(lastRec?.timestamp)).toISOString() !==
           this.setToSecondZero(DateNow).toISOString()
@@ -154,7 +130,10 @@ export class SensorsService {
     }
   }
   //==============================================
-  async addRecordSeries(sensorUnique: string, value: number) {
+  async addRecordSeries(
+    sensorAddress: { SMultiport: number; Multiport: number; Port: number },
+    value: number,
+  ) {
     if (value === 200000) {
       return {
         status: 203,
@@ -162,34 +141,49 @@ export class SensorsService {
       };
     }
 
-    console.log('sssssssssssss', sensorUnique);
+    console.log('sssssssssssss', sensorAddress);
     try {
       const date = new Date();
-      const lastRec = await this.sensorSeriesModel
-        .findOne({ 'metaField.sensorUnique': sensorUnique })
-        .sort({ timestamp: -1 });
-      const sensorSettings = await this.sensorModel.findOne({
-        sensorUniqueName: sensorUnique,
+      const FindSensor = await this.sensorModel.findOne({
+        superMultiport: sensorAddress.SMultiport,
+        multiport: sensorAddress.Multiport,
+        port: sensorAddress.Port,
       });
+
+      if (FindSensor === null) {
+        console.log('sensor not found', sensorAddress);
+        return {
+          status: 404,
+          err: 'sensor id is Not Found',
+        };
+      }
+      console.log('sensorfound', FindSensor._id);
+      const lastRec = await this.sensorSeriesModel
+        .findOne({ sensorId: FindSensor._id })
+        .sort({ timestamp: -1 });
+      // const sensorSettings = await this.sensorModel.findOne({
+      //   sensorUniqueName: sensorAddress,
+      // });
       let resultCheck = false;
-      console.log(sensorSettings);
+      // console.log(sensorSettings);
 
       if (date === null) {
         resultCheck = true;
       } else {
         resultCheck = await this.checkTimeStampWithRsolution(
-          sensorSettings.resolution,
+          FindSensor.resolution,
           date,
-          sensorUnique,
+          FindSensor._id,
         );
       }
       console.log(resultCheck);
 
       const newRecord = new this.sensorSeriesModel({
         timestamp: date,
+        sensorId: FindSensor._id,
         metaField: {
           incremental: (lastRec?.metaField?.incremental ?? 0) + 1,
-          sensorUnique: sensorUnique,
+
           value: value,
           average:
             ((lastRec?.metaField?.average ?? value) *
@@ -206,17 +200,24 @@ export class SensorsService {
               : lastRec?.metaField?.min ?? value,
         },
       });
+
       if (resultCheck === true) {
         const rec = await newRecord.save();
-        return { status: 201, record: rec, sensor: sensorSettings };
+        const findAndup = await this.sensorModel.findOneAndUpdate(
+          FindSensor._id,
+          { ...{ sensorLastSerie: newRecord._id } },
+        );
+        return { status: 201, record: rec, sensor: FindSensor };
       } else {
         return {
           status: 200,
           message: 'recordIsDuplicateInResolution',
-          sensor: sensorSettings,
+          sensor: FindSensor,
         };
       }
     } catch (err) {
+      console.log(err);
+
       return {
         status: 404,
         err: JSON.stringify(err) ?? 'sensor id is Not Found',
@@ -332,6 +333,23 @@ export class SensorsService {
   async removeTimeSeriesById(id: mongoose.Types.ObjectId) {
     const iddd = new mongoose.Types.ObjectId(id);
     return await this.sensorSeriesModel.findByIdAndDelete(iddd);
+  }
+  //==============================================
+  async getLastRecordOfSeries(SensorId: mongoose.Types.ObjectId) {
+    const iddd = new mongoose.Types.ObjectId(SensorId);
+    console.log(SensorId);
+    return await this.sensorSeriesModel
+      .findOne({ sensorId: iddd })
+      .sort({ timestamp: -1 });
+  }
+  //==============================================
+  async getXYOfSensorTimeSeries(SensorId: mongoose.Types.ObjectId) {
+    const iddd = new mongoose.Types.ObjectId(SensorId);
+    console.log(SensorId);
+    return await this.sensorSeriesModel
+      .find({ sensorId: iddd })
+      .select(['metaField.value', 'timestamp'])
+      .sort({ timestamp: -1 });
   }
 }
 //==============================================

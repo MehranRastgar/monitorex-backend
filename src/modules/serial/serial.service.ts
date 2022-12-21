@@ -6,13 +6,13 @@ import { SensorsService } from '../sensors/sensor/sensors.service';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Sensor, sensorseries } from '../sensors/sensor/sensor.model';
-
+//===========================================
 interface DelimiterOptions extends TransformOptions {
   delimiter: string | Buffer | number[];
 
   includeDelimiter?: boolean;
 }
-
+//===========================================
 interface ParsedDevicesData {
   statuse: number;
   addrMultiPort: number;
@@ -29,13 +29,18 @@ export class SerialService {
     baudRate: 19200,
     autoOpen: true,
   });
-  parser = this.port.pipe(
-    new ReadlineParser({
-      delimiter: [250],
-      decodeStrings: false,
-      encoding: 'hex',
-    }),
-  );
+  parser = this.port
+    .pipe(
+      new ReadlineParser({
+        delimiter: [250],
+        decodeStrings: false,
+        encoding: 'hex',
+      }),
+    )
+    .on('data', (packet) => {
+      this.packetHandler(packet);
+    });
+  //===========================================
   parseSensorPacket(data: string) {
     const faPart = data.substring(0, 2);
     const addr1 = data.substring(2, 4);
@@ -90,7 +95,7 @@ export class SerialService {
     return DeviceMap;
     // console.log('sensorPlusEnd:', DeviceMap);
   }
-
+  //===========================================
   packetHandler(packet: string) {
     if (packet.substring(0, 2) === 'f0') {
       //valid sensor handler
@@ -106,13 +111,13 @@ export class SerialService {
       console.log(parsedPacket?.sensors.length);
       if (parsedPacket?.sensors.length)
         parsedPacket?.sensors?.map((sensitem, index) => {
-          const createUnique =
-            parsedPacket.addrSMultiPort.toString() +
-            '_' +
-            parsedPacket.addrMultiPort.toString() +
-            '_' +
-            index.toString();
-          this.sensorsService.addRecordSeries(createUnique, sensitem);
+          const address = {
+            SMultiport: parsedPacket.addrSMultiPort,
+            Multiport: parsedPacket.addrMultiPort,
+            Port: index,
+          };
+
+          this.sensorsService.addRecordSeries(address, sensitem);
         });
       // parsedPacket?.sensors?.map((sensitem, index) => {
       //   const createUnique =
@@ -129,6 +134,7 @@ export class SerialService {
       //ghat handler
     }
   }
+  //===========================================
   async test_basic_connect() {
     try {
       // Switches the port into "flowing mode"
