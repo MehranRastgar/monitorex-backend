@@ -29,30 +29,27 @@ export const SensorSchema = new mongoose.Schema(
   },
   { timestamps: true },
 );
-export const sensorseries = new mongoose.Schema({
-  timestamp: mongoose.Schema.Types.Date,
-  sensorId: mongoose.Schema.Types.ObjectId,
-  metaField: {
-    sensorUnique: String,
-    incremental: Number,
-    value: Number,
-    max: Number,
-    min: Number,
-    average: Number,
+export const sensorseries = new mongoose.Schema(
+  {
+    timestamp: mongoose.Schema.Types.Date,
+    sensorId: mongoose.Schema.Types.ObjectId,
+    metaField: {
+      sensorUnique: String,
+      incremental: Number,
+      value: Number,
+      max: Number,
+      min: Number,
+      average: Number,
+    },
   },
-  attr1: { type: mongoose.Schema.Types.ObjectId, ref: 'attr1' },
-  attr2: { type: mongoose.Schema.Types.ObjectId, ref: 'attr2' },
-  date: { type: Date, default: Date.now },
-  analytics: {
-    metric: { type: Number },
+  {
+    timeseries: {
+      timeField: 'timestamp',
+      metaField: 'metaField',
+      granularity: 'minutes',
+    },
   },
-
-  info: {
-    sub1: { type: String },
-    sub2: { type: String },
-    sub3: { type: String },
-  },
-});
+);
 
 // export const timeSeriesSensors = SensorRecords.plugin(mongotimeseries, {
 //   target: 'sensorseries',
@@ -98,19 +95,5 @@ export interface sensorseries {
     max: number;
     min: number;
     average: number;
-  };
-  dateField: mongotimeseries.date;
-  resolutions: 'minute' | 'hour';
-  key: {
-    attr1: number;
-    attr2: number;
-    info: number;
-  };
-  data: {
-    metric: {
-      source: object;
-      operations: 'sum' | 'max' | 'min';
-      calculations: 'average' | 'range' | 'range_min' | 'range_max';
-    };
   };
 }

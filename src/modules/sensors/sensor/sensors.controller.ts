@@ -77,4 +77,13 @@ export class SensorsController {
     const result = await this.sensorsService.getXYOfSensorTimeSeries(param.id);
     return result;
   }
+  @Get('/sensor/xyspec/:id')
+  async getXYOfSensorWithSpec(@Param() param, @Query() query) {
+    console.log(param.id);
+    const startTime = new Date(query.St);
+    const endTime = new Date(query.Et);
+    const resolution = new Date(query.Res);
+    const result = await this.sensorsService.getXYOfSensorTimeSeries(param.id);
+    return result;
+  }
 }
