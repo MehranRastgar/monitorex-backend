@@ -86,4 +86,11 @@ export class SensorsController {
     const result = await this.sensorsService.getXYOfSensorTimeSeries(param.id);
     return result;
   }
+  @Get('/sensor/withgranularity/:id')
+  async getWithGranularity(@Param() param) {
+    const result = await this.sensorsService.getSenSorSeriesWithGranularity(
+      param.id,
+    );
+    return result;
+  }
 }

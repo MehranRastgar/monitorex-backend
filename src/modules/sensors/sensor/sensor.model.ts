@@ -26,6 +26,10 @@ export const SensorSchema = new mongoose.Schema(
       validator: true,
     },
     resolution: { type: String, default: 'minute' },
+    sensorRealtimeValues: {
+      value: { type: Number },
+      updateTime: { type: Date, required: true },
+    },
   },
   { timestamps: true },
 );
@@ -82,8 +86,12 @@ export interface Sensor {
   sensorUniqueName: string;
   resolution: 'second' | 'minute' | 'hour';
   sensorLastSerie: sensorseries;
+  sensorRealtimeValues: SensorRealtimeValues;
 }
-
+export interface SensorRealtimeValues {
+  value: number;
+  updateTime: Date;
+}
 export interface sensorseries {
   timestamp: mongotimeseries.date;
   target: typeof mongotimeseries;

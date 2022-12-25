@@ -201,6 +201,17 @@ export class SensorsService {
         },
       });
 
+      const findAndup = await this.sensorModel.findOneAndUpdate(
+        FindSensor._id,
+        {
+          ...{
+            sensorRealtimeValues: {
+              value: value ?? undefined,
+              updateTime: new Date(),
+            },
+          },
+        },
+      );
       if (resultCheck === true) {
         const rec = await newRecord.save();
         const findAndup = await this.sensorModel.findOneAndUpdate(
@@ -349,6 +360,39 @@ export class SensorsService {
     return await this.sensorSeriesModel
       .find({ sensorId: iddd })
       .select(['metaField.value', 'timestamp'])
+      .sort({ timestamp: -1 });
+  }
+  //==============================================
+  async getSenSorSeriesWithGranularity(SensorId: string) {
+    const id = new mongoose.Types.ObjectId(SensorId);
+    const startDate = new Date('2022-12-22T18:59:03.599Z');
+    const endDate = new Date('2022-12-24T22:59:03.599Z');
+
+    return await this.sensorSeriesModel
+      .aggregate([
+        {
+          $match: {
+            sensorId: id,
+          },
+        },
+        {
+          $densify: {
+            field: 'timestamp',
+            range: {
+              step: 10,
+              unit: 'minute',
+              bounds: 'full', //[startDate, endDate],
+              // bounds: 'full',
+            },
+          },
+        },
+        {
+          $group: {
+            _id: null,
+            data: { $push: { x: '$timestamp', y: '$metaField.value' } },
+          },
+        },
+      ])
       .sort({ timestamp: -1 });
   }
 }
