@@ -7,6 +7,7 @@ import {
   UsePipes,
   ValidationPipe,
   Body,
+  Put,
   Param,
   Query,
   Res,
@@ -14,6 +15,7 @@ import {
   Response,
   Delete,
 } from '@nestjs/common';
+import { Device } from './devices.model';
 
 @Controller('devices')
 export class DevicesController {
@@ -22,6 +24,11 @@ export class DevicesController {
   @Post('/')
   async deviceCreate(@Body() deviceData) {
     const result = await this.devicesService.insertDevice(deviceData);
+    return result;
+  }
+  @Put('/:id')
+  async deviceUpdate(@Body() deviceData: Device, @Param() param) {
+    const result = await this.devicesService.putDevice(param.id, deviceData);
     return result;
   }
   @Get('/')

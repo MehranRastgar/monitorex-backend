@@ -1,4 +1,5 @@
 import * as mongoose from 'mongoose';
+import { sensorseries } from '../sensors/sensor/sensor.model';
 
 const deviceAddress = new mongoose.Schema({
   multiPort: {
@@ -22,6 +23,39 @@ const factorsSchema = new mongoose.Schema({
   factorValue: { type: Number, required: true },
 });
 
+const SensorSchema = new mongoose.Schema(
+  {
+    // deviceId: {
+    //   type: mongoose.Types.ObjectId,
+    //   ref: 'Device',
+    //   autopopulate: true,
+    // },
+    sensorLastSerie: {
+      type: mongoose.Types.ObjectId,
+      ref: 'sensorseries',
+      autopopulate: true,
+    },
+    title: { type: String, required: true },
+    // superMultiport: { type: Number, required: true },
+    // multiport: { type: Number, required: true },
+    port: { type: Number, required: false },
+    type: { type: String, required: true },
+    unit: { type: String, required: true },
+    // sensorUniqueName: {
+    //   type: String,
+    //   required: true,
+    //   unique: true,
+    //   validator: true,
+    // },
+    resolution: { type: String, default: 'minute' },
+    sensorRealtimeValues: {
+      value: { type: Number },
+      updateTime: { type: Date },
+    },
+  },
+  { timestamps: true },
+);
+
 export const DeviceSchema = new mongoose.Schema(
   {
     title: { type: String, required: true },
@@ -43,19 +77,20 @@ export const DeviceSchema = new mongoose.Schema(
       validator: true,
       enum: [1, 2, 3, 4, 5, 6, 7, 8],
     },
-    sensors: [
-      {
-        sensorId: {
-          type: mongoose.Types.ObjectId,
-          ref: 'Sensor',
-          autopopulate: true,
-        },
-      },
-    ],
+    sensors: [SensorSchema],
+    // {
+    //   sensorId: {
+    //     type: mongoose.Types.ObjectId,
+    //     ref: 'Sensor',
+    //     autopopulate: true,
+    //   },
+    // },
+
     factors: [factorsSchema],
   },
   { timestamps: true },
 );
+
 export interface factors {
   factorName: string;
   factorPosition:
@@ -86,4 +121,22 @@ export interface Device {
   type: 'Electrical panel' | 'Sensor Cotroller';
   DeviceUniqueName: string;
   factors: factors[];
+  sensors: Sensor[];
+}
+export interface Sensor {
+  deviceId: mongoose.Schema.Types.ObjectId;
+  title: string;
+  // superMultiport: number;
+  // multiport: number;
+  port?: number;
+  type: string;
+  unit: string;
+  // sensorUniqueName: string;
+  resolution?: 'second' | 'minute' | 'hour';
+  sensorLastSerie?: sensorseries;
+  sensorRealtimeValues?: SensorRealtimeValues;
+}
+export interface SensorRealtimeValues {
+  value: number;
+  updateTime: Date;
 }
