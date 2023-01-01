@@ -93,6 +93,7 @@ export interface SensorRealtimeValues {
   updateTime: Date;
 }
 export interface sensorseries {
+  // _id: mongoose.Schema.Types.ObjectId;
   timestamp: mongotimeseries.date;
   target: typeof mongotimeseries;
   sensorId: mongoose.Schema.Types.ObjectId;

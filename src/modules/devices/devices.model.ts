@@ -91,6 +91,22 @@ export const DeviceSchema = new mongoose.Schema(
   { timestamps: true },
 );
 
+export const TempDevicesSchema = new mongoose.Schema({
+  deviceId: {
+    type: mongoose.Types.ObjectId,
+    ref: 'Device',
+    autopopulate: true,
+  },
+  sensorId: mongoose.Schema.Types.ObjectId,
+  value: { type: Number },
+  createdAt: { type: Date, expires: 120, default: Date.now },
+});
+export interface TempDevice {
+  deviceId: Device;
+  sensorId: mongoose.Schema.Types.ObjectId;
+  value: number;
+  createdAt: Date;
+}
 export interface factors {
   factorName: string;
   factorPosition:
@@ -124,6 +140,7 @@ export interface Device {
   sensors: Sensor[];
 }
 export interface Sensor {
+  _id: mongoose.Schema.Types.ObjectId;
   deviceId: mongoose.Schema.Types.ObjectId;
   title: string;
   // superMultiport: number;

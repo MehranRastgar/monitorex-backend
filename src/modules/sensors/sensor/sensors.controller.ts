@@ -22,7 +22,7 @@ export class SensorsController {
   constructor(private sensorsService: SensorsService) {}
   @Get('/')
   async getAllSensors(@Query() query: ParsedUrlQuery) {
-    return await this.sensorsService.getAllSensors(query);
+    return await this.sensorsService.getAllSensorsNew(query);
   }
   @Post('/')
   @HttpCode(201)
@@ -88,7 +88,7 @@ export class SensorsController {
   }
   @Get('/sensor/withgranularity/:id')
   async getWithGranularity(@Param() param) {
-    const result = await this.sensorsService.getSenSorSeriesWithGranularity(
+    const result = await this.sensorsService.getsensorseriesWithGranularity(
       param.id,
     );
     return result;

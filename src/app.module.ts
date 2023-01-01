@@ -14,9 +14,12 @@ import {
   SensorSchema,
   sensorseries,
 } from './modules/sensors/sensor/sensor.model';
+import { GatewayModule } from './modules/gateway/gateway.module';
+import { MyGateway } from './modules/gateway/gateway';
 
 @Module({
   imports: [
+    GatewayModule,
     QuizModule,
     MongooseModule.forRoot('mongodb://root:password@localhost:27018'),
     SensorsModule,
@@ -28,6 +31,6 @@ import {
     ]),
   ],
   controllers: [AppController],
-  providers: [AppService, Database, SensorsService],
+  providers: [AppService, Database, SensorsService, MyGateway],
 })
 export class AppModule {}
