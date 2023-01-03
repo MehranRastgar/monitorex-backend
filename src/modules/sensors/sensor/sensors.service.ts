@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import mongoose, { Model, Number } from 'mongoose';
 import { ParsedUrlQuery } from 'querystring';
+import { timestamp } from 'rxjs';
 import { order, sort } from '../interface';
 import { Sensor, sensorseries } from './sensor.model';
 // import * as SerialPort from 'serialport';
@@ -388,6 +389,45 @@ export class SensorsService {
       .find({ sensorId: iddd })
       .select(['metaField.value', 'timestamp'])
       .sort({ timestamp: -1 });
+  }
+  //==============================================
+  async getValueDateOfSensorTimeSeries(
+    SensorId: mongoose.Types.ObjectId,
+    limit?: number,
+  ) {
+    const id = new mongoose.Types.ObjectId(SensorId);
+    console.log(SensorId);
+    return await this.sensorseriesModel.aggregate([
+      {
+        $match: {
+          sensorId: id,
+        },
+      },
+      {
+        $densify: {
+          field: 'timestamp',
+          range: {
+            step: 10,
+            unit: 'minute',
+            bounds: 'full', //[startDate, endDate],
+            // bounds: 'full',
+          },
+        },
+      },
+      // {
+      //   $group: {
+      //     _id: null,
+      //     data: {
+      //       $push: {
+      //         date: '$timestamp',
+      //         value: '$metaField.value',
+      //       },
+      //     },
+      //   },
+      // },
+      { $sort: { timestamp: -1 } },
+      { $limit: limit ?? 5 },
+    ]);
   }
   //==============================================
   async getsensorseriesWithGranularity(SensorId: string) {

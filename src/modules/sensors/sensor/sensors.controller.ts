@@ -71,6 +71,16 @@ export class SensorsController {
     return result;
   }
 
+  @Get('/sensor/valuedate/:id')
+  async getValueDateOfSensor(@Param() param, @Query() query) {
+    console.log(param.id);
+    const result = await this.sensorsService.getValueDateOfSensorTimeSeries(
+      param.id,
+      query.limit,
+    );
+    return result;
+  }
+
   @Get('/sensor/xy/:id')
   async getXYOfSensor(@Param() param) {
     console.log(param.id);

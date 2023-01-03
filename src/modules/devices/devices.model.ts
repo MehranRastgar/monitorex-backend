@@ -41,6 +41,8 @@ const SensorSchema = new mongoose.Schema(
     port: { type: Number, required: false },
     type: { type: String, required: true },
     unit: { type: String, required: true },
+    maxAlarm: { type: Number },
+    minAlarm: { type: Number },
     // sensorUniqueName: {
     //   type: String,
     //   required: true,
@@ -148,6 +150,8 @@ export interface Sensor {
   port?: number;
   type: string;
   unit: string;
+  maxAlarm: number;
+  minAlarm: number;
   // sensorUniqueName: string;
   resolution?: 'second' | 'minute' | 'hour';
   sensorLastSerie?: sensorseries;

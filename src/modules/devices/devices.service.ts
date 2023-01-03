@@ -109,7 +109,22 @@ export class DevicesService {
         const date = new Date();
         this.gateway.server.emit(String(device._id), temp);
         this.gateway.server.emit(String(sensor._id), temp);
-
+        if (temp?.value > sensor.maxAlarm) {
+          this.gateway.server.emit('alarms', {
+            message: 'maximum Range',
+            value: sensor.maxAlarm,
+            sensorId: sensor._id,
+            sensorTitle: sensor.title,
+          });
+        }
+        if (temp?.value < sensor.minAlarm) {
+          this.gateway.server.emit('alarms', {
+            message: 'minimum Range',
+            value: sensor.minAlarm,
+            sensorId: sensor._id,
+            sensorTitle: sensor.title,
+          });
+        }
         const lastRec = await this.sensorseriesModel
           .findOne({ sensorId: sensor._id })
           .sort({ timestamp: -1 });
