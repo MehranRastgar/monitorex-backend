@@ -67,12 +67,6 @@ export const DeviceSchema = new mongoose.Schema(
       enum: ['Electrical panel', 'Sensor Cotroller'],
       required: true,
     },
-    DeviceUniqueName: {
-      type: String,
-      required: true,
-      unique: true,
-      validator: true,
-    },
     numberOfPorts: {
       type: Number,
       required: true,
@@ -137,7 +131,6 @@ export interface Device {
   title: string;
   address: deviceAddress;
   type: 'Electrical panel' | 'Sensor Cotroller';
-  DeviceUniqueName: string;
   factors: factors[];
   sensors: Sensor[];
 }
