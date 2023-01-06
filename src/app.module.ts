@@ -16,6 +16,9 @@ import {
 } from './modules/sensors/sensor/sensor.model';
 import { GatewayModule } from './modules/gateway/gateway.module';
 import { MyGateway } from './modules/gateway/gateway';
+import { UsersModule } from './users/users.module';
+import { APP_GUARD } from '@nestjs/core';
+import { RolesGuard } from './users/roles.guard';
 
 @Module({
   imports: [
@@ -29,8 +32,15 @@ import { MyGateway } from './modules/gateway/gateway';
       { name: 'Sensor', schema: SensorSchema },
       { name: 'sensorseries', schema: sensorseries },
     ]),
+    UsersModule,
   ],
   controllers: [AppController],
-  providers: [AppService, Database, SensorsService, MyGateway],
+  providers: [
+    AppService,
+    Database,
+    SensorsService,
+    MyGateway,
+    { provide: APP_GUARD, useClass: RolesGuard },
+  ],
 })
 export class AppModule {}

@@ -7,7 +7,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Sensor, sensorseries } from '../sensors/sensor/sensor.model';
 import { DevicesService } from '../devices/devices.service';
-
+const portname = 'COM4';
 //===========================================
 interface DelimiterOptions extends TransformOptions {
   delimiter: string | Buffer | number[];
@@ -27,12 +27,15 @@ export class SerialService {
   constructor(
     private sensorsService: SensorsService,
     private devicesService: DevicesService,
-  ) {}
-  mybuffer: string[] = [];
+  ) {
+    this.test_basic_connect();
+    setInterval(() => this.test_basic_connect(), 30000);
+    // let mybuffer: string[] = [];
+  }
   port = new SerialPort({
-    path: 'COM4',
+    path: portname,
     baudRate: 19200,
-    autoOpen: true,
+    autoOpen: false,
   });
   parser = this.port
     .pipe(
@@ -212,17 +215,42 @@ export class SerialService {
   async test_basic_connect() {
     try {
       // Switches the port into "flowing mode"
+      if (this.port.isOpen === true) {
+        return true;
+      }
+      console.log('inited');
+      SerialPort.list().then(
+        (ports1) => {
+          if (ports1.findIndex((po) => po.path === portname) >= 0) {
+            this.port.open();
+          } else {
+            console.log('com port is not connected');
+            return false;
+          }
+          ports1.forEach(console.log);
+        },
+        (err) => console.error(err),
+      );
+
       // this.port.on('data', function (data) {
       //   console.log('this.mybuffer:', data);
       // });
       this.parser.on('data', (packet) => {
         this.packetHandler(packet);
       });
+      return true;
 
       // Pipe the data into another stream (like a parser or standard out)
-      return this.mybuffer;
+      // return this.mybuffer;
     } catch (err) {
-      return err;
+      // console.log(err);
+      return true;
+    }
+  }
+  ManageInit() {
+    // console.log('check serial port');
+    if (this.port.isOpen === false) {
+      this.test_basic_connect();
     }
   }
 }
