@@ -168,7 +168,7 @@ export class DevicesService {
           },
         });
         //newRecord._id
-        console.log(sensor._id);
+        // console.log(sensor._id);
 
         if (resultCheck === true && value !== 200000)
           makeSensorMany.push(newRecord);

@@ -7,7 +7,9 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Sensor, sensorseries } from '../sensors/sensor/sensor.model';
 import { DevicesService } from '../devices/devices.service';
+
 const portname = 'COM4';
+const baudRate = 19200;
 //===========================================
 interface DelimiterOptions extends TransformOptions {
   delimiter: string | Buffer | number[];
@@ -28,26 +30,25 @@ export class SerialService {
     private sensorsService: SensorsService,
     private devicesService: DevicesService,
   ) {
-    this.test_basic_connect();
-    setInterval(() => this.test_basic_connect(), 30000);
+    // this.test_basic_connect();
+    setInterval(() => this.test_basic_connect(), 3000);
     // let mybuffer: string[] = [];
   }
   port = new SerialPort({
     path: portname,
-    baudRate: 19200,
+    baudRate: baudRate,
     autoOpen: false,
   });
-  parser = this.port
-    .pipe(
-      new ReadlineParser({
-        delimiter: [250],
-        decodeStrings: false,
-        encoding: 'hex',
-      }),
-    )
-    .on('data', (packet) => {
-      this.packetHandler(packet);
-    });
+  parser = this.port.pipe(
+    new ReadlineParser({
+      delimiter: [250],
+      decodeStrings: false,
+      encoding: 'hex',
+    }),
+  );
+  //   .on('data', (packet) => {
+  //     this.packetHandler(packet);
+  //   });
   //===========================================
   parseSensorPacket(data: string) {
     const faPart = data.substring(0, 2);
@@ -222,8 +223,31 @@ export class SerialService {
       SerialPort.list().then(
         (ports1) => {
           if (ports1.findIndex((po) => po.path === portname) >= 0) {
-            this.port.open();
+            // this.parser.
+            this.port = new SerialPort({
+              path: portname,
+              baudRate: baudRate,
+              autoOpen: true,
+            });
+            this.parser = this.port
+              .pipe(
+                new ReadlineParser({
+                  delimiter: [250],
+                  decodeStrings: false,
+                  encoding: 'hex',
+                }),
+              )
+              .on('data', (packet) => {
+                this.packetHandler(packet);
+              });
+
+            console.log('parser listener');
+            // console.log(ports1);
           } else {
+            this.parser.off('data', (packet) => {
+              this.packetHandler(packet);
+            });
+            // this.port.close();
             console.log('com port is not connected');
             return false;
           }
@@ -235,9 +259,7 @@ export class SerialService {
       // this.port.on('data', function (data) {
       //   console.log('this.mybuffer:', data);
       // });
-      this.parser.on('data', (packet) => {
-        this.packetHandler(packet);
-      });
+
       return true;
 
       // Pipe the data into another stream (like a parser or standard out)
@@ -247,10 +269,10 @@ export class SerialService {
       return true;
     }
   }
-  ManageInit() {
-    // console.log('check serial port');
-    if (this.port.isOpen === false) {
-      this.test_basic_connect();
-    }
-  }
+  // ManageInit() {
+  //   // console.log('check serial port');
+  //   if (this.port.isOpen === false) {
+  //     this.test_basic_connect();
+  //   }
+  // }
 }
