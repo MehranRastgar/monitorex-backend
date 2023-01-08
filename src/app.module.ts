@@ -19,6 +19,11 @@ import { MyGateway } from './modules/gateway/gateway';
 import { UsersModule } from './users/users.module';
 import { APP_GUARD } from '@nestjs/core';
 import { RolesGuard } from './users/roles.guard';
+import { AuthService } from './auth/auth.service';
+import { AuthModule } from './auth/auth.module';
+import { UsersService } from './users/users.service';
+import { UserSchema } from './users/user.model';
+import { JwtModule, JwtService } from '@nestjs/jwt/dist';
 
 @Module({
   imports: [
@@ -31,8 +36,12 @@ import { RolesGuard } from './users/roles.guard';
     MongooseModule.forFeature([
       { name: 'Sensor', schema: SensorSchema },
       { name: 'sensorseries', schema: sensorseries },
+      { name: 'User', schema: UserSchema },
     ]),
     UsersModule,
+    AuthModule,
+    UsersModule,
+    JwtModule,
   ],
   controllers: [AppController],
   providers: [
@@ -41,6 +50,9 @@ import { RolesGuard } from './users/roles.guard';
     SensorsService,
     MyGateway,
     { provide: APP_GUARD, useClass: RolesGuard },
+    AuthService,
+    UsersService,
+    JwtService,
   ],
 })
 export class AppModule {}

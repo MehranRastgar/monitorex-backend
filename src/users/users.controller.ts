@@ -13,10 +13,17 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { Role } from './entities/role.enum';
 import { Roles } from './roles.decorator';
+import { UseGuards } from '@nestjs/common/decorators/core/use-guards.decorator';
+import { LocalAuthGuard } from 'src/auth/local-auth.guard';
+import { Request } from '@nestjs/common/decorators/http/route-params.decorator';
+import { AuthService } from 'src/auth/auth.service';
 
 @Controller('users')
 export class UsersController {
-  constructor(private readonly usersService: UsersService) {}
+  constructor(
+    private readonly usersService: UsersService,
+    private readonly authService: AuthService,
+  ) {}
 
   @Post()
   // @SetMetadata('roles', [Role.ADMIN])
@@ -26,6 +33,7 @@ export class UsersController {
   }
 
   @Get()
+  @Roles(Role.ADMIN)
   findAll() {
     return this.usersService.findAll();
   }
@@ -43,5 +51,12 @@ export class UsersController {
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.usersService.remove(+id);
+  }
+
+  @UseGuards(LocalAuthGuard)
+  @Post('login')
+  login(@Request() req): any {
+    return this.authService.login(req.user);
+    // return req.user;
   }
 }

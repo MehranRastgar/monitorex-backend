@@ -219,7 +219,7 @@ export class SerialService {
       if (this.port.isOpen === true) {
         return true;
       }
-      console.log('inited');
+      // console.log('inited');
       SerialPort.list().then(
         (ports1) => {
           if (ports1.findIndex((po) => po.path === portname) >= 0) {
@@ -248,7 +248,7 @@ export class SerialService {
               this.packetHandler(packet);
             });
             // this.port.close();
-            console.log('com port is not connected');
+            // console.log('com port is not connected');
             return false;
           }
           ports1.forEach(console.log);
