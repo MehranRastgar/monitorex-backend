@@ -5,11 +5,16 @@ import { AuthService } from 'src/auth/auth.service';
 import { MongooseModule } from '@nestjs/mongoose';
 import { JwtModule } from '@nestjs/jwt/dist';
 import { UserSchema } from './user.model';
+import { AbilityModule } from 'src/ability/ability.module';
 
 @Module({
   imports: [
+    AbilityModule,
     MongooseModule.forFeature([{ name: 'User', schema: UserSchema }]),
-    JwtModule.register({ secret: 'MEHRAN', signOptions: { expiresIn: '60s' } }),
+    JwtModule.register({
+      secret: 'MEHRAN',
+      signOptions: { expiresIn: '3600s' },
+    }),
   ],
   controllers: [UsersController],
   providers: [UsersService, AuthService],

@@ -16,14 +16,16 @@ export class RolesGuard implements CanActivate {
       context.getHandler(),
       context.getClass(),
     ]);
+    console.log('require roles ');
     if (!requireRoles) {
-      return true;
+      return false;
     }
-    //const { user } = context.switchToHttp().getRequest();
-    const user: User = {
-      name: 'admin',
-      roles: [Role.USER],
-    };
-    return requireRoles.some((role) => user.roles.includes(role));
+    return false;
+    // //const { user } = context.switchToHttp().getRequest();
+    // const user: User = {
+    //   name: 'admin',
+    //   roles: [Role.USER],
+    // };
+    // return requireRoles.some((role) => user.roles.includes(role));
   }
 }

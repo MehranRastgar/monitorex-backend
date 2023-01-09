@@ -6,6 +6,7 @@ import { UserSchema } from 'src/users/user.model';
 import { UsersModule } from 'src/users/users.module';
 import { UsersService } from 'src/users/users.service';
 import { AuthService } from './auth.service';
+import { JwtStrategy } from './jwt.strategy';
 import { LocalStartegy } from './local.strategy';
 
 @Module({
@@ -13,9 +14,12 @@ import { LocalStartegy } from './local.strategy';
     UsersModule,
     PassportModule,
     MongooseModule.forFeature([{ name: 'User', schema: UserSchema }]),
-    JwtModule.register({ secret: 'MEHRAN', signOptions: { expiresIn: '60s' } }),
+    JwtModule.register({
+      secret: 'MEHRAN',
+      signOptions: { expiresIn: '3600s' },
+    }),
   ],
-  providers: [AuthService, LocalStartegy, UsersService],
+  providers: [AuthService, LocalStartegy, JwtStrategy, UsersService],
   exports: [AuthService],
 })
 export class AuthModule {}

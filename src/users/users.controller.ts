@@ -17,24 +17,48 @@ import { UseGuards } from '@nestjs/common/decorators/core/use-guards.decorator';
 import { LocalAuthGuard } from 'src/auth/local-auth.guard';
 import { Request } from '@nestjs/common/decorators/http/route-params.decorator';
 import { AuthService } from 'src/auth/auth.service';
+import { JwtAuthGuard, Public } from 'src/auth/jwt-auth.guard';
+import { AbilityFactory } from 'src/ability/ability.factory/ability.factory';
+import { AbilityAction, UserType } from './user.model';
+import { User, UserCl } from './entities/user.entity';
+import { Model } from 'mongoose';
+import { InjectModel } from '@nestjs/mongoose';
+import { AbilityGuard } from './ability.guard';
+import { JwtStrategy } from 'src/auth/jwt.strategy';
 
 @Controller('users')
 export class UsersController {
   constructor(
     private readonly usersService: UsersService,
     private readonly authService: AuthService,
+    private readonly abilityFactory: AbilityFactory,
+    @InjectModel('User') private readonly userModel: Model<UserType>,
   ) {}
 
-  @Post()
   // @SetMetadata('roles', [Role.ADMIN])
-  @Roles(Role.ADMIN)
-  create(@Body() createUserDto: CreateUserDto) {
+  // @Roles(Role.ADMIN)
+  @Post()
+  @UseGuards(JwtAuthGuard)
+  @UseGuards(AbilityGuard)
+  async create(@Body() createUserDto: CreateUserDto) {
+    // const ability = this.abilityFactory.defineAbility()
+    // password: CryptoJS.AES.encrypt(
+    //   req.body.password,
+    //   process.env.PASS_SEC
+    // ).toString(),
+    // const user: UserType = await this.userModel.findById('');
+    // const ability = this.abilityFactory.defineAbility(user);
     return this.usersService.create(createUserDto);
   }
 
+  @UseGuards(JwtAuthGuard)
   @Get()
-  @Roles(Role.ADMIN)
-  findAll() {
+  // @Roles(Role.ADMIN)
+  async findAll() {
+    // const user: UserType = await this.userModel.findById('');
+    // const ability = this.abilityFactory.defineAbility(user);
+
+    // const isAllowed = ability.can(AbilityAction.Create, User);
     return this.usersService.findAll();
   }
 
@@ -53,6 +77,7 @@ export class UsersController {
     return this.usersService.remove(+id);
   }
 
+  @Public()
   @UseGuards(LocalAuthGuard)
   @Post('login')
   login(@Request() req): any {

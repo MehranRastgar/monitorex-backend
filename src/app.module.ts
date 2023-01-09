@@ -24,6 +24,7 @@ import { AuthModule } from './auth/auth.module';
 import { UsersService } from './users/users.service';
 import { UserSchema } from './users/user.model';
 import { JwtModule, JwtService } from '@nestjs/jwt/dist';
+import { JwtAuthGuard } from './auth/jwt-auth.guard';
 
 @Module({
   imports: [
@@ -38,7 +39,6 @@ import { JwtModule, JwtService } from '@nestjs/jwt/dist';
       { name: 'sensorseries', schema: sensorseries },
       { name: 'User', schema: UserSchema },
     ]),
-    UsersModule,
     AuthModule,
     UsersModule,
     JwtModule,
@@ -49,7 +49,11 @@ import { JwtModule, JwtService } from '@nestjs/jwt/dist';
     Database,
     SensorsService,
     MyGateway,
-    { provide: APP_GUARD, useClass: RolesGuard },
+    {
+      provide: APP_GUARD,
+      useClass: JwtAuthGuard,
+    },
+    // { provide: APP_GUARD, useClass: RolesGuard },
     AuthService,
     UsersService,
     JwtService,
