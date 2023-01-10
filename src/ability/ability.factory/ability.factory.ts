@@ -31,7 +31,7 @@ export class AbilityFactory {
       console.log('he is an admin ');
       can(AbilityAction.Manage, 'all');
     } else {
-      can(userFromDb?.accessControll?.profile, User);
+      can(userFromDb?.accessControll?.users, User);
       can(userFromDb?.accessControll?.devices, Device);
     }
     return build({

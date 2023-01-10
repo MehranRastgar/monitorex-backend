@@ -25,6 +25,7 @@ import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { AbilityGuard } from './ability.guard';
 import { JwtStrategy } from 'src/auth/jwt.strategy';
+import { CheckAbility } from 'src/ability/ability.factory/ability.decorator';
 
 @Controller('users')
 export class UsersController {
@@ -38,8 +39,9 @@ export class UsersController {
   // @SetMetadata('roles', [Role.ADMIN])
   // @Roles(Role.ADMIN)
   @Post()
-  @UseGuards(JwtAuthGuard)
+  // @UseGuards(JwtAuthGuard)
   @UseGuards(AbilityGuard)
+  @CheckAbility({ action: AbilityAction.Manage, subject: User })
   async create(@Body() createUserDto: CreateUserDto) {
     // const ability = this.abilityFactory.defineAbility()
     // password: CryptoJS.AES.encrypt(
@@ -51,9 +53,9 @@ export class UsersController {
     return this.usersService.create(createUserDto);
   }
 
-  @UseGuards(JwtAuthGuard)
   @Get()
-  // @Roles(Role.ADMIN)
+  @UseGuards(AbilityGuard)
+  @CheckAbility({ action: AbilityAction.Read, subject: User })
   async findAll() {
     // const user: UserType = await this.userModel.findById('');
     // const ability = this.abilityFactory.defineAbility(user);
@@ -63,16 +65,22 @@ export class UsersController {
   }
 
   @Get(':id')
+  @UseGuards(AbilityGuard)
+  @CheckAbility({ action: AbilityAction.Read, subject: User })
   findOne(@Param('id') id: string) {
     return this.usersService.findOne(+id);
   }
 
   @Patch(':id')
+  @UseGuards(AbilityGuard)
+  @CheckAbility({ action: AbilityAction.Update, subject: User })
   update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
     return this.usersService.update(+id, updateUserDto);
   }
 
   @Delete(':id')
+  @UseGuards(AbilityGuard)
+  @CheckAbility({ action: AbilityAction.Manage, subject: User })
   remove(@Param('id') id: string) {
     return this.usersService.remove(+id);
   }
