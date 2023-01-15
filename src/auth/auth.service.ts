@@ -35,4 +35,17 @@ export class AuthService {
       access_token: this.jwtService.sign(payload),
     };
   }
+  async isLogin(token: string) {
+    // const payload = {
+    //   name: user._doc.name,
+    //   sub: user._doc._id,
+    //   isAdmin: user._doc.isAdmin,
+    //   accessControll: { ...user._doc.accessControll },
+    // };
+
+    console.log('login', this.jwtService.decode(token));
+    return {
+      access_token: token,
+    };
+  }
 }

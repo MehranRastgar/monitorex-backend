@@ -30,7 +30,11 @@ import { JwtAuthGuard } from './auth/jwt-auth.guard';
   imports: [
     GatewayModule,
     QuizModule,
-    MongooseModule.forRoot('mongodb://root:password@localhost:27018'),
+    MongooseModule.forRoot('mongodb://root:password@localhost:27018', {
+      dbName: 'test',
+      retryAttempts: 5000,
+      retryDelay: 5,
+    }),
     SensorsModule,
     DevicesModule,
     SerialModule,

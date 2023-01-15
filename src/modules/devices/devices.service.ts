@@ -5,7 +5,7 @@ import { MyGateway } from '../gateway/gateway';
 import { Sensor, sensorseries } from '../sensors/sensor/sensor.model';
 import { SensorsService } from '../sensors/sensor/sensors.service';
 import { ParsedDevicesData } from '../serial/serial.service';
-import { Device, TempDevice } from './devices.model';
+import { Device, SensorType, TempDevice } from './devices.model';
 
 @Injectable()
 export class DevicesService {
@@ -20,11 +20,11 @@ export class DevicesService {
     private gateway: MyGateway,
   ) {}
   //=============================================================================
-  async insertDevice(DeviceData: Device) {
+  async insertDevice(DeviceData: Device): Promise<Device | string> {
     const newDevice = new this.deviceModel({ ...DeviceData });
     try {
       const result = await newDevice.save();
-      return result._id;
+      return result;
     } catch (err) {
       return 'err:' + JSON.stringify(err);
     }
@@ -92,7 +92,8 @@ export class DevicesService {
     // console.log('sensors:', dev.sensors.length);
     // console.log('factors:', dev.factors.length);
 
-    const makeSensorMany: any[] = [];
+    const makeSensorMany: sensorseries[] = [];
+    const makeSensorslastSeries: sensorseries[] = [];
     await Promise.all(
       dev.sensors.map(async (sensor, index) => {
         //first i fill the temps
@@ -109,6 +110,7 @@ export class DevicesService {
         const date = new Date();
         this.gateway.server.emit(String(device._id), temp);
         this.gateway.server.emit(String(sensor._id), temp);
+
         if (temp?.value > sensor.maxAlarm) {
           this.gateway.server.emit('alarms', {
             message: 'maximum Range',
@@ -167,18 +169,50 @@ export class DevicesService {
                 : lastRec?.metaField?.min ?? value,
           },
         });
-        //newRecord._id
-        // console.log(sensor._id);
+        //
 
+        // console.log(sensor._id);
         if (resultCheck === true && value !== 200000)
           makeSensorMany.push(newRecord);
+        makeSensorslastSeries.push(newRecord);
       }),
     );
     try {
-      const many = await this.sensorseriesModel.insertMany(makeSensorMany);
+      const many = await this.sensorseriesModel.insertMany(makeSensorMany); //makeSensorMany
+
+      const tt = await this.deviceModel.findByIdAndUpdate(
+        new mongoose.Types.ObjectId(String(device._id)),
+        {
+          $set: {
+            sensorLastSerie: makeSensorslastSeries,
+          },
+        },
+        { new: true },
+      );
+      // const sensorss: SensorPrim[] = [];
+      // device.sensors.map((sens, index) => {
+      //   const id =
+      //     makeSensorMany[
+      //       makeSensorMany.findIndex((item) => item.sensorId === sens._id)
+      //     ]._id;
+      //   sensorss.push({
+      //     ...sens,
+      //     sensorLastSerie: id,
+      //   });
+      // });
+
+      // const deviceNew = new this.deviceModel({
+      //   ...device,
+      //   sensors: [...device.sensors],
+      // });
+
       console.log(
         '=================>>>>>>>>>>>>>>>>>>>>>>',
         makeSensorMany.length,
+        makeSensorslastSeries.length,
+        // new mongoose.Types.ObjectId(String(device._id)),
+        // tt,
+        // deviceNew,
       );
       return many;
       // const result = await many.save();

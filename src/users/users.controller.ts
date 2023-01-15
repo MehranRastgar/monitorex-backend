@@ -1,5 +1,6 @@
 import {
   Controller,
+  Request as resqu,
   Get,
   Post,
   Body,
@@ -15,7 +16,10 @@ import { Role } from './entities/role.enum';
 import { Roles } from './roles.decorator';
 import { UseGuards } from '@nestjs/common/decorators/core/use-guards.decorator';
 import { LocalAuthGuard } from 'src/auth/local-auth.guard';
-import { Request } from '@nestjs/common/decorators/http/route-params.decorator';
+import {
+  Headers,
+  Request,
+} from '@nestjs/common/decorators/http/route-params.decorator';
 import { AuthService } from 'src/auth/auth.service';
 import { JwtAuthGuard, Public } from 'src/auth/jwt-auth.guard';
 import { AbilityFactory } from 'src/ability/ability.factory/ability.factory';
@@ -90,6 +94,13 @@ export class UsersController {
   @Post('login')
   login(@Request() req): any {
     return this.authService.login(req.user);
+    // return req.user;
+  }
+
+  @Get('login/islogin')
+  isLogin(@Headers('authorization') authorization: string): any {
+    console.log('islogin called', authorization);
+    return this.authService.isLogin(authorization);
     // return req.user;
   }
 }

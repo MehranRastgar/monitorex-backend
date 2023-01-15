@@ -14,17 +14,24 @@ import {
   HttpStatus,
   Response,
   Delete,
+  BadRequestException,
 } from '@nestjs/common';
 import { Device } from './devices.model';
+import mongoose, { Model } from 'mongoose';
 
 @Controller('devices')
 export class DevicesController {
   constructor(private devicesService: DevicesService) {}
 
   @Post('/')
+  @HttpCode(201)
   async deviceCreate(@Body() deviceData) {
     const result = await this.devicesService.insertDevice(deviceData);
-    return result;
+    if (typeof result === 'string') {
+      throw new BadRequestException(result);
+    } else {
+      return result;
+    }
   }
   @Put('/:id')
   async deviceUpdate(@Body() deviceData: Device, @Param() param) {

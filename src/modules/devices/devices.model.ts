@@ -30,11 +30,9 @@ const SensorSchema = new mongoose.Schema(
     //   ref: 'Device',
     //   autopopulate: true,
     // },
-    sensorLastSerie: {
-      type: mongoose.Types.ObjectId,
-      ref: 'sensorseries',
-      autopopulate: true,
-    },
+    // sensorLastSerie: {
+    //   type: sensorseries,
+    // },
     title: { type: String, required: true },
     // superMultiport: { type: Number, required: true },
     // multiport: { type: Number, required: true },
@@ -74,6 +72,7 @@ export const DeviceSchema = new mongoose.Schema(
       enum: [1, 2, 3, 4, 5, 6, 7, 8],
     },
     sensors: [SensorSchema],
+    sensorLastSerie: [sensorseries],
     // {
     //   sensorId: {
     //     type: mongoose.Types.ObjectId,
@@ -133,6 +132,7 @@ export interface Device {
   type: 'Electrical panel' | 'Sensor Cotroller';
   factors: factors[];
   sensors: Sensor[];
+  sensorLastSerie?: sensorseries;
 }
 export interface Sensor {
   _id: mongoose.Schema.Types.ObjectId;
@@ -147,7 +147,21 @@ export interface Sensor {
   minAlarm: number;
   // sensorUniqueName: string;
   resolution?: 'second' | 'minute' | 'hour';
-  sensorLastSerie?: sensorseries;
+  sensorRealtimeValues?: SensorRealtimeValues;
+}
+export interface SensorType {
+  _id: mongoose.Schema.Types.ObjectId;
+  deviceId: mongoose.Schema.Types.ObjectId;
+  title: string;
+  // superMultiport: number;
+  // multiport: number;
+  port?: number;
+  type: string;
+  unit: string;
+  maxAlarm: number;
+  minAlarm: number;
+  // sensorUniqueName: string;
+  resolution?: 'second' | 'minute' | 'hour';
   sensorRealtimeValues?: SensorRealtimeValues;
 }
 export interface SensorRealtimeValues {
