@@ -46,9 +46,6 @@ export class SerialService {
       encoding: 'hex',
     }),
   );
-  //   .on('data', (packet) => {
-  //     this.packetHandler(packet);
-  //   });
   //===========================================
   parseSensorPacket(data: string) {
     const faPart = data.substring(0, 2);
@@ -269,10 +266,4 @@ export class SerialService {
       return true;
     }
   }
-  // ManageInit() {
-  //   // console.log('check serial port');
-  //   if (this.port.isOpen === false) {
-  //     this.test_basic_connect();
-  //   }
-  // }
 }

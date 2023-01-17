@@ -2,7 +2,8 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import mongoose, { Model, Number } from 'mongoose';
 import { ParsedUrlQuery } from 'querystring';
-import { timestamp } from 'rxjs';
+import { map, timestamp } from 'rxjs';
+import { Device } from 'src/modules/devices/entities/device.entity';
 import { order, sort } from '../interface';
 import { Sensor, sensorseries } from './sensor.model';
 // import * as SerialPort from 'serialport';
@@ -13,6 +14,7 @@ export class SensorsService {
   // private: sensors: Sensor
   constructor(
     @InjectModel('Sensor') private readonly sensorModel: Model<Sensor>,
+    @InjectModel('Device') private readonly deviceModel: Model<Device>,
     @InjectModel('sensorseries')
     private readonly sensorseriesModel: Model<sensorseries>,
   ) {}
@@ -461,6 +463,51 @@ export class SensorsService {
         },
       ])
       .sort({ timestamp: -1 });
+  }
+  //==============================================
+  async getSensorsReport(SensorIds: string[], start: string, end: string) {
+    const startDate = new Date(start);
+    const endDate = new Date(end);
+    const resultArray: any[] = [];
+    await Promise.all(
+      SensorIds?.map(async (SensorId, index) => {
+        const id = new mongoose.Types.ObjectId(SensorId);
+        const sens = await this.deviceModel.findOne({ 'sensors._id': id });
+        const result = await this.sensorseriesModel
+          .aggregate([
+            {
+              $match: {
+                sensorId: id,
+              },
+            },
+            {
+              $densify: {
+                field: 'timestamp',
+                range: {
+                  step: 10,
+                  unit: 'minute',
+                  bounds: 'full', //[startDate, endDate],
+                  // bounds: 'full',
+                },
+              },
+            },
+            {
+              $group: {
+                _id: id,
+                data: {
+                  $push: { x: '$timestamp', y: '$metaField.value' },
+                },
+              },
+            },
+          ])
+          .sort({ timestamp: -1 });
+        const ind = sens.sensors.findIndex(
+          (item) => String(item._id) === SensorId,
+        );
+        resultArray.push({ ...result, sensor: sens.sensors[ind] });
+      }),
+    );
+    return resultArray;
   }
 }
 //==============================================

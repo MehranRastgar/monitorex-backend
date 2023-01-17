@@ -103,4 +103,13 @@ export class SensorsController {
     );
     return result;
   }
+  @Post('/report')
+  async getSensorsReport(@Body() body) {
+    const result = await this.sensorsService.getSensorsReport(
+      body?.sensors,
+      body?.startTime,
+      body?.endTime,
+    );
+    return result;
+  }
 }

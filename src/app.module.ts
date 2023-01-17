@@ -25,6 +25,7 @@ import { UsersService } from './users/users.service';
 import { UserSchema } from './users/user.model';
 import { JwtModule, JwtService } from '@nestjs/jwt/dist';
 import { JwtAuthGuard } from './auth/jwt-auth.guard';
+import { DeviceSchema } from './modules/devices/devices.model';
 
 @Module({
   imports: [
@@ -41,6 +42,7 @@ import { JwtAuthGuard } from './auth/jwt-auth.guard';
     MongooseModule.forFeature([
       { name: 'Sensor', schema: SensorSchema },
       { name: 'sensorseries', schema: sensorseries },
+      { name: 'Device', schema: DeviceSchema },
       { name: 'User', schema: UserSchema },
     ]),
     AuthModule,
