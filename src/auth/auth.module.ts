@@ -16,7 +16,7 @@ import { LocalStartegy } from './local.strategy';
     MongooseModule.forFeature([{ name: 'User', schema: UserSchema }]),
     JwtModule.register({
       secret: 'MEHRAN',
-      signOptions: { expiresIn: '3600s' },
+      signOptions: { expiresIn: '24h' },
     }),
   ],
   providers: [AuthService, LocalStartegy, JwtStrategy, UsersService],

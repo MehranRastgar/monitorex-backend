@@ -13,7 +13,7 @@ import { AbilityModule } from 'src/ability/ability.module';
     MongooseModule.forFeature([{ name: 'User', schema: UserSchema }]),
     JwtModule.register({
       secret: 'MEHRAN',
-      signOptions: { expiresIn: '3600s' },
+      signOptions: { expiresIn: '24h' },
     }),
   ],
   controllers: [UsersController],
