@@ -469,6 +469,11 @@ export class SensorsService {
     const startDate = new Date(start);
     const endDate = new Date(end);
     const resultArray: any[] = [];
+    console.log(
+      'startDate.toISOString(),',
+      endDate.toISOString(),
+      startDate.toISOString(),
+    );
     await Promise.all(
       SensorIds?.map(async (SensorId, index) => {
         const id = new mongoose.Types.ObjectId(SensorId);
@@ -478,6 +483,10 @@ export class SensorsService {
             {
               $match: {
                 sensorId: id,
+                timestamp: {
+                  $gte: new Date(start),
+                  $lte: new Date(end),
+                },
               },
             },
             {

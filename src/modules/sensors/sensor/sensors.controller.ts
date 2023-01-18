@@ -104,11 +104,12 @@ export class SensorsController {
     return result;
   }
   @Post('/report')
+  @HttpCode(200)
   async getSensorsReport(@Body() body) {
     const result = await this.sensorsService.getSensorsReport(
       body?.sensors,
-      body?.startTime,
-      body?.endTime,
+      body?.start,
+      body?.end,
     );
     return result;
   }
