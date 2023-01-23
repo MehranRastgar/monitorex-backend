@@ -159,52 +159,23 @@ export class SerialService {
   //===========================================
   packetHandler(packet: string) {
     if (packet.substring(0, 2) === 'f0') {
-      //valid sensor handler
-      // console.log(packet);
-      // const parsedData: ParsedDevicesData =
       const parsedPacket: ParsedDevicesData = this.parseSensorPacket(packet);
-      // console.log(
-      //   'ParsedDevicesData',
-      //   parsedPacket.addrSMultiPort,
-      //   parsedPacket.addrMultiPort,
-      //   parsedPacket.sensors,
-      // );
-      // console.log(parsedPacket?.sensors.length);
-
-      // console.log(
-      //   parsedPacket?.sensors,
-      //   'address:',
-      //   parsedPacket.addrSMultiPort,
-      //   parsedPacket.addrMultiPort,
-      // );
       const address = {
         SMultiport: parsedPacket.addrSMultiPort,
         Multiport: parsedPacket.addrMultiPort,
-        // Port: index,
       };
       this.devicesService.addRecordSeriesWithDevice(address, parsedPacket);
-      // if (parsedPacket?.sensors.length)
-      //   parsedPacket?.sensors?.map((sensitem, index) => {
-      //     const address = {
-      //       SMultiport: parsedPacket.addrSMultiPort,
-      //       Multiport: parsedPacket.addrMultiPort,
-      //       Port: index,
-      //     };
-
-      //     this.sensorsService.addRecordSeries(address, sensitem);
-      //   });
-
-      // parsedPacket?.sensors?.map((sensitem, index) => {
-      //   const createUnique =
-      //     parsedPacket.addrSMultiPort.toString() +
-      //     '_' +
-      //     parsedPacket.addrMultiPort.toLocaleString() +
-      //     '_' +
-      //     index.toLocaleString();
-      //   this.sensorsService.addRecordSeries(createUnique, sensitem);
-      // });
+      return;
     }
-
+    if (packet.substring(0, 2) === 'eb') {
+      const parsedPacket: ParsedDevicesData = this.parseSensorPacket(packet);
+      const address = {
+        SMultiport: parsedPacket.addrSMultiPort,
+        Multiport: parsedPacket.addrMultiPort,
+      };
+      this.devicesService.addElectricalBoardSerries(address, packet);
+      console.log('is electrical');
+    }
     if (packet.substring(0, 2) === 'f5') {
       //ghat handler
     }
@@ -238,7 +209,7 @@ export class SerialService {
                 this.packetHandler(packet);
               });
 
-            console.log('parser listener');
+            // console.log('parser listener');
             // console.log(ports1);
           } else {
             this.parser.off('data', (packet) => {
@@ -248,7 +219,7 @@ export class SerialService {
             // console.log('com port is not connected');
             return false;
           }
-          ports1.forEach(console.log);
+          // ports1.forEach(console.log);
         },
         (err) => console.error(err),
       );

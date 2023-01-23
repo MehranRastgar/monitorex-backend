@@ -25,7 +25,7 @@ import { UsersService } from './users/users.service';
 import { UserSchema } from './users/user.model';
 import { JwtModule, JwtService } from '@nestjs/jwt/dist';
 import { JwtAuthGuard } from './auth/jwt-auth.guard';
-import { DeviceSchema } from './modules/devices/devices.model';
+import { DeviceSchema, ebSeries } from './modules/devices/devices.model';
 
 @Module({
   imports: [
@@ -42,6 +42,7 @@ import { DeviceSchema } from './modules/devices/devices.model';
     MongooseModule.forFeature([
       { name: 'Sensor', schema: SensorSchema },
       { name: 'sensorseries', schema: sensorseries },
+      { name: 'ebSeries', schema: ebSeries },
       { name: 'Device', schema: DeviceSchema },
       { name: 'User', schema: UserSchema },
     ]),

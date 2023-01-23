@@ -5,7 +5,11 @@ import { SensorsService } from '../sensors/sensor/sensors.service';
 import { MongooseModule } from '@nestjs/mongoose';
 import { SensorSchema, sensorseries } from '../sensors/sensor/sensor.model';
 import { DevicesService } from '../devices/devices.service';
-import { DeviceSchema, TempDevicesSchema } from '../devices/devices.model';
+import {
+  DeviceSchema,
+  TempDevicesSchema,
+  ebSeries,
+} from '../devices/devices.model';
 import { MyGateway } from '../gateway/gateway';
 
 @Module({
@@ -13,6 +17,7 @@ import { MyGateway } from '../gateway/gateway';
     MongooseModule.forFeature([
       { name: 'Sensor', schema: SensorSchema },
       { name: 'sensorseries', schema: sensorseries },
+      { name: 'ebSeries', schema: ebSeries },
       { name: 'Device', schema: DeviceSchema },
       { name: 'TempDevices', schema: TempDevicesSchema },
     ]),

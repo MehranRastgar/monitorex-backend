@@ -5,7 +5,7 @@ import { GatewayModule } from '../gateway/gateway.module';
 import { SensorSchema, sensorseries } from '../sensors/sensor/sensor.model';
 import { SensorsService } from '../sensors/sensor/sensors.service';
 import { DevicesController } from './devices.controller';
-import { DeviceSchema, TempDevicesSchema } from './devices.model';
+import { DeviceSchema, ebSeries, TempDevicesSchema } from './devices.model';
 import { DevicesService } from './devices.service';
 
 @Module({
@@ -14,6 +14,7 @@ import { DevicesService } from './devices.service';
     MongooseModule.forFeature([
       { name: 'Device', schema: DeviceSchema },
       { name: 'Sensor', schema: SensorSchema },
+      { name: 'ebSeries', schema: ebSeries },
       { name: 'sensorseries', schema: sensorseries },
       { name: 'TempDevices', schema: TempDevicesSchema },
     ]),

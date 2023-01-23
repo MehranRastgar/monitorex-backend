@@ -1,5 +1,6 @@
 import * as mongoose from 'mongoose';
 import { sensorseries } from '../sensors/sensor/sensor.model';
+import * as mongotimeseries from 'mongoose-timeseries';
 
 const deviceAddress = new mongoose.Schema({
   multiPort: {
@@ -21,6 +22,13 @@ const factorsSchema = new mongoose.Schema({
     enum: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12, 13, 14, 15, 16],
   },
   factorValue: { type: Number, required: true },
+});
+
+export const ElectricalSchema = new mongoose.Schema({
+  status: { type: Boolean },
+  deviceRelationId: { type: mongoose.Schema.Types.ObjectId },
+  deviceName: { type: String },
+  lastStatus: { type: Boolean },
 });
 
 const SensorSchema = new mongoose.Schema(
@@ -80,7 +88,7 @@ export const DeviceSchema = new mongoose.Schema(
     //     autopopulate: true,
     //   },
     // },
-
+    electricals: [ElectricalSchema],
     factors: [factorsSchema],
   },
   { timestamps: true },
@@ -132,6 +140,7 @@ export interface Device {
   type: 'Electrical panel' | 'Sensor Cotroller';
   factors: factors[];
   sensors: Sensor[];
+  electricals: ElectricalPanelType[];
   sensorLastSerie?: sensorseries;
 }
 export interface Sensor {
@@ -164,7 +173,44 @@ export interface SensorType {
   resolution?: 'second' | 'minute' | 'hour';
   sensorRealtimeValues?: SensorRealtimeValues;
 }
+
+export interface ElectricalPanelType {
+  _id: mongoose.Schema.Types.ObjectId;
+  deviceRelationId?: mongoose.Schema.Types.ObjectId;
+  deviceName: string;
+  lastStatus?: boolean;
+}
+
 export interface SensorRealtimeValues {
   value: number;
   updateTime: Date;
+}
+export const ebSeries = new mongoose.Schema(
+  {
+    timestamp: mongoose.Schema.Types.Date,
+    deviceId: mongoose.Schema.Types.ObjectId,
+    metaField: {
+      byte1: Number,
+      byte2: Number,
+      byte3: Number,
+    },
+  },
+  {
+    timeseries: {
+      timeField: 'timestamp',
+      metaField: 'metaField',
+      granularity: 'minutes',
+    },
+  },
+);
+export interface ebSeries {
+  // _id: mongoose.Schema.Types.ObjectId;
+  timestamp: mongotimeseries.date;
+  // target: typeof mongotimeseries;
+  sensorId: mongoose.Schema.Types.ObjectId;
+  metaField: {
+    byte1: number;
+    byte2: number;
+    byte3: number;
+  };
 }

@@ -3,6 +3,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import mongoose, { Model, Number } from 'mongoose';
 import { ParsedUrlQuery } from 'querystring';
 import { map, timestamp } from 'rxjs';
+import { ebSeries } from 'src/modules/devices/devices.model';
 import { Device } from 'src/modules/devices/entities/device.entity';
 import { order, sort } from '../interface';
 import { Sensor, sensorseries } from './sensor.model';
@@ -17,6 +18,8 @@ export class SensorsService {
     @InjectModel('Device') private readonly deviceModel: Model<Device>,
     @InjectModel('sensorseries')
     private readonly sensorseriesModel: Model<sensorseries>,
+    @InjectModel('ebSeries')
+    private readonly ebModel: Model<ebSeries>,
   ) {}
   //==============================================
   async insertSensor(
@@ -493,7 +496,7 @@ export class SensorsService {
               $densify: {
                 field: 'timestamp',
                 range: {
-                  step: 10,
+                  step: 5,
                   unit: 'minute',
                   bounds: 'full', //[startDate, endDate],
                   // bounds: 'full',
@@ -517,6 +520,44 @@ export class SensorsService {
       }),
     );
     return resultArray;
+  }
+  //==============================================
+  async getEBReport(deviceID: string, start: string, end: string) {
+    const id = new mongoose.Types.ObjectId(deviceID);
+    // const sens = await this.deviceModel.findOne({ 'sensors._id': id });
+    const result = await this.ebModel
+      .aggregate([
+        {
+          $match: {
+            deviceId: id,
+            timestamp: {
+              $gte: new Date(start),
+              $lte: new Date(end),
+            },
+          },
+        },
+        {
+          $densify: {
+            field: 'timestamp',
+            range: {
+              step: 10,
+              unit: 'minute',
+              bounds: 'full', //[startDate, endDate],
+              // bounds: 'full',
+            },
+          },
+        },
+        {
+          $group: {
+            _id: id,
+            data: {
+              $push: { x: '$timestamp', y: '$metaField.value' },
+            },
+          },
+        },
+      ])
+      .sort({ timestamp: -1 });
+    return result;
   }
 }
 //==============================================

@@ -113,4 +113,14 @@ export class SensorsController {
     );
     return result;
   }
+  @Post('/report/eb')
+  @HttpCode(200)
+  async getEBReport(@Body() body) {
+    const result = await this.sensorsService.getEBReport(
+      body?.device,
+      body?.start,
+      body?.end,
+    );
+    return result;
+  }
 }

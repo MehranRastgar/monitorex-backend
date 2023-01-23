@@ -18,14 +18,14 @@ export class MyGateway implements OnModuleInit {
 
   onModuleInit() {
     this.server.on('connection', (socket) => {
-      console.log(socket.id);
-      console.log('Connected');
+      // console.log(socket.id);
+      // console.log('Connected');
     });
   }
 
   @SubscribeMessage('newMessage')
   onNewMessage(@MessageBody() body: any) {
-    console.log(body);
+    // console.log(body);
     this.server.emit('onMessage', {
       msg: 'New Message',
       content: body,

@@ -5,12 +5,13 @@ import { MyGateway } from '../gateway/gateway';
 import { Sensor, sensorseries } from '../sensors/sensor/sensor.model';
 import { SensorsService } from '../sensors/sensor/sensors.service';
 import { ParsedDevicesData } from '../serial/serial.service';
-import { Device, SensorType, TempDevice } from './devices.model';
+import { Device, ebSeries, SensorType, TempDevice } from './devices.model';
 
 @Injectable()
 export class DevicesService {
   constructor(
     @InjectModel('Device') private readonly deviceModel: Model<Device>,
+    @InjectModel('ebSeries') private readonly ebModel: Model<ebSeries>,
     @InjectModel('Sensor') private readonly sensorModel: Model<Sensor>,
     @InjectModel('sensorseries')
     private readonly sensorseriesModel: Model<sensorseries>,
@@ -88,9 +89,11 @@ export class DevicesService {
       return;
     }
     const dev = device.toJSON();
-
-    // console.log('sensors:', dev.sensors.length);
-    // console.log('factors:', dev.factors.length);
+    // console.log('dev.type', dev.type);
+    if (dev?.type === 'Electrical panel') {
+      console.log('is tablo');
+      return;
+    }
 
     const makeSensorMany: sensorseries[] = [];
     const makeSensorslastSeries: sensorseries[] = [];
@@ -189,34 +192,13 @@ export class DevicesService {
         },
         { new: true },
       );
-      // const sensorss: SensorPrim[] = [];
-      // device.sensors.map((sens, index) => {
-      //   const id =
-      //     makeSensorMany[
-      //       makeSensorMany.findIndex((item) => item.sensorId === sens._id)
-      //     ]._id;
-      //   sensorss.push({
-      //     ...sens,
-      //     sensorLastSerie: id,
-      //   });
-      // });
 
-      // const deviceNew = new this.deviceModel({
-      //   ...device,
-      //   sensors: [...device.sensors],
-      // });
-
-      console.log(
-        '=================>>>>>>>>>>>>>>>>>>>>>>',
-        makeSensorMany.length,
-        makeSensorslastSeries.length,
-        // new mongoose.Types.ObjectId(String(device._id)),
-        // tt,
-        // deviceNew,
-      );
+      // console.log(
+      //   '=================>>>>>>>>>>>>>>>>>>>>>>',
+      //   makeSensorMany.length,
+      //   makeSensorslastSeries.length,
+      // );
       return many;
-      // const result = await many.save();
-      // console.log(result);
     } catch (e) {
       console.log(e);
     }
@@ -228,257 +210,88 @@ export class DevicesService {
     //   console.log(factor, index);
     // });
   }
+  //=============================================================================
+  async ParseElectricalPacket(packet: string): Promise<elecChannels> {
+    console.log('eb===>>', packet);
+    const ETX: string = packet.substring(packet.length - 2, packet.length);
+    console.log(
+      'end of packet',
+      packet.substring(packet.length - 2, packet.length),
+    );
+
+    if (ETX !== 'e6') {
+      console.log('end of packet is damages');
+      return;
+    }
+    const data = packet.substring(6, packet.length - 2);
+    const Ch1_7 = data.substring(0, 2);
+    const Ch8_14 = data.substring(2, 4);
+    const Ch15_21 = data.substring(4, 6);
+    // const hen = data.length / 2;
+    // let str = '';
+    // for (let i = 0; i < hen; i++) {
+    //   const x = data.substring(i * 2, i * 2 + 2);
+    //   str += parseInt(x, 16).toString(2).substring(0, 7);
+    // }
+    // console.log(Ch1_7, Ch8_14, Ch15_21);
+    return {
+      Ch1_7: parseInt(Ch1_7, 16),
+      Ch8_14: parseInt(Ch8_14, 16),
+      Ch15_21: parseInt(Ch15_21, 16),
+    } as elecChannels;
+  }
+  //=============================================================================
+  async addElectricalBoardSerries(
+    address: { SMultiport: number; Multiport: number },
+    packet: string,
+  ) {
+    const device = await this.deviceModel.findOne({
+      'address.multiPort': address.Multiport,
+      'address.sMultiPort': address.SMultiport,
+    });
+    const dev = device.toJSON();
+    const str: elecChannels = await this.ParseElectricalPacket(packet);
+    const dateRef = new Date();
+    dateRef.setMilliseconds(0);
+    dateRef.setSeconds(0);
+    const lastRec = await this.ebModel
+      .findOne({ deviceId: device._id })
+      .sort({ timestamp: -1 });
+    const newSerie = new this.ebModel({
+      deviceId: device._id,
+      timestamp: dateRef,
+      metaField: {
+        byte1: str.Ch1_7,
+        byte2: str.Ch8_14,
+        byte3: str.Ch15_21,
+      },
+    });
+
+    if (
+      lastRec?.timestamp < dateRef ||
+      lastRec?.timestamp === undefined ||
+      newSerie.metaField.byte1 !== lastRec.metaField.byte1 ||
+      newSerie.metaField.byte2 !== lastRec.metaField.byte2 ||
+      newSerie.metaField.byte3 !== lastRec.metaField.byte3
+    ) {
+      await newSerie.save();
+    }
+    this.gateway.server.emit(String(device._id), newSerie);
+    // console.log(str, dev);
+  }
 }
+//   {
+//     timestamp: mongoose.Schema.Types.Date,
+//     deviceId: mongoose.Schema.Types.ObjectId,
+//     metaField: {
+//       byte1: Number,
+//       byte2: Number,
+//       byte3: Number,
+//     },
+//   },
 
-// [
-//   {
-//     timestamp: 2022-12-31T16:05:53.905Z,
-//     sensorId: new ObjectId("63af0a208cddd72ced131b38"),
-//     metaField: {
-//       incremental: 1,
-//       value: 21,
-//       max: 21,
-//       min: 21,
-//       average: 21
-//     },
-//     _id: new ObjectId("63b05de1ac5f4a4fe9183f7c")
-//   },
-//   {
-//     timestamp: 2022-12-31T16:05:53.909Z,
-//     sensorId: new ObjectId("63af0a208cddd72ced131b39"),
-//     metaField: {
-//       incremental: 1,
-//       value: 200000,
-//       max: 200000,
-//       min: 200000,
-//       average: 200000
-//     },
-//     _id: new ObjectId("63b05de1ac5f4a4fe9183f7d")
-//   },
-//   {
-//     timestamp: 2022-12-31T16:05:53.909Z,
-//     sensorId: new ObjectId("63af0a208cddd72ced131b3a"),
-//     metaField: {
-//       incremental: 1,
-//       value: 200000,
-//       max: 200000,
-//       min: 200000,
-//       average: 200000
-//     },
-//     _id: new ObjectId("63b05de1ac5f4a4fe9183f7e")
-//   },
-//   {
-//     timestamp: 2022-12-31T16:05:53.910Z,
-//     sensorId: new ObjectId("63af0a208cddd72ced131b3b"),
-//     metaField: {
-//       incremental: 1,
-//       value: 200000,
-//       max: 200000,
-//       min: 200000,
-//       average: 200000
-//     },
-//     _id: new ObjectId("63b05de1ac5f4a4fe9183f7f")
-//   }
-// ]
-// [
-// {
-//   timestamp: 2022-12-31T16:17:19.683Z,
-//   sensorId: new ObjectId("63af0a208cddd72ced131b38"),
-//   metaField: { incremental: 1, value: 21, max: 21, min: 21, average: 21 },
-//   _id: new ObjectId("63b0608f8f5849ccb350d16a")
-// },
-// {
-//   timestamp: 2022-12-31T16:17:19.683Z,
-//   sensorId: new ObjectId("63af0a208cddd72ced131b39"),
-//   metaField: {
-//     incremental: 1,
-//     value: 200000,
-//     max: 200000,
-//     min: 200000,
-//     average: 200000
-//   },
-//   _id: new ObjectId("63b0608f8f5849ccb350d16b")
-// },
-// {
-//   timestamp: 2022-12-31T16:17:19.683Z,
-//   sensorId: new ObjectId("63af0a208cddd72ced131b3a"),
-//   metaField: {
-//     incremental: 1,
-//     value: 200000,
-//     max: 200000,
-//     min: 200000,
-//     average: 200000
-//   },
-//   _id: new ObjectId("63b0608f8f5849ccb350d16c")
-// },
-// {
-//   timestamp: 2022-12-31T16:17:19.684Z,
-//   sensorId: new ObjectId("63af0a208cddd72ced131b3b"),
-//   metaField: {
-//     incremental: 1,
-//     value: 200000,
-//     max: 200000,
-//     min: 200000,
-//     average: 200000
-//   },
-//   _id: new ObjectId("63b0608f8f5849ccb350d16d")
-// },
-// {
-//   timestamp: 2022-12-31T16:17:19.684Z,
-//   sensorId: new ObjectId("63b0604c8f5849ccb350d034"),
-//   metaField: {
-//     incremental: 1,
-//     value: 200000,
-//     max: 200000,
-//     min: 200000,
-//     average: 200000
-//   },
-//   _id: new ObjectId("63b0608f8f5849ccb350d16e")
-// },
-// {
-//   timestamp: 2022-12-31T16:17:19.684Z,
-//   sensorId: new ObjectId("63b0604c8f5849ccb350d035"),
-//   metaField: {
-//     incremental: 1,
-//     value: 200000,
-//     max: 200000,
-//     min: 200000,
-//     average: 200000
-//   },
-//   _id: new ObjectId("63b0608f8f5849ccb350d16f")
-// },
-// {
-//   timestamp: 2022-12-31T16:17:19.684Z,
-//   sensorId: new ObjectId("63b0604c8f5849ccb350d036"),
-//   metaField: {
-//     incremental: 1,
-//     value: 200000,
-//     max: 200000,
-//     min: 200000,
-//     average: 200000
-//   },
-//   _id: new ObjectId("63b0608f8f5849ccb350d170")
-// },
-// {
-//   timestamp: 2022-12-31T16:17:19.684Z,
-//   sensorId: new ObjectId("63b0604c8f5849ccb350d037"),
-//   metaField: {
-//     incremental: 1,
-//     value: 35.5,
-//     max: 35.5,
-//     min: 35.5,
-//     average: 35.5
-//   },
-//   _id: new ObjectId("63b0608f8f5849ccb350d171")
-// }
-// ]
-
-// [
-//   {
-//     timestamp: 2022-12-31T16:29:55.829Z,
-//     sensorId: new ObjectId("63af0a208cddd72ced131b38"),
-//     metaField: {
-//       incremental: 1,
-//       value: 21,
-//       max: 21,
-//       min: 21,
-//       average: 21
-//     },
-//     _id: new ObjectId("63b063832c4f359bf80d09da"),
-//     __v: 0
-//   },
-//   {
-//     timestamp: 2022-12-31T16:29:55.831Z,
-//     sensorId: new ObjectId("63af0a208cddd72ced131b39"),
-//     metaField: {
-//       incremental: 1,
-//       value: 200000,
-//       max: 200000,
-//       min: 200000,
-//       average: 200000
-//     },
-//     _id: new ObjectId("63b063832c4f359bf80d09db"),
-//     __v: 0
-//   },
-//   {
-//     timestamp: 2022-12-31T16:29:55.832Z,
-//     sensorId: new ObjectId("63af0a208cddd72ced131b3a"),
-//     metaField: {
-//       incremental: 1,
-//       value: 200000,
-//       max: 200000,
-//       min: 200000,
-//       average: 200000
-//     },
-//     _id: new ObjectId("63b063832c4f359bf80d09dc"),
-//     __v: 0
-//   },
-//   {
-//     timestamp: 2022-12-31T16:29:55.832Z,
-//     sensorId: new ObjectId("63af0a208cddd72ced131b3b"),
-//     metaField: {
-//       incremental: 1,
-//       value: 200000,
-//       max: 200000,
-//       min: 200000,
-//       average: 200000
-//     },
-//     _id: new ObjectId("63b063832c4f359bf80d09dd"),
-//     __v: 0
-//   },
-//   {
-//     timestamp: 2022-12-31T16:29:55.833Z,
-//     sensorId: new ObjectId("63b0604c8f5849ccb350d034"),
-//     metaField: {
-//       incremental: 1,
-//       value: 200000,
-//       max: 200000,
-//       min: 200000,
-//       average: 200000
-//     },
-//     _id: new ObjectId("63b063832c4f359bf80d09de"),
-//     __v: 0
-//   },
-//   {
-//     timestamp: 2022-12-31T16:29:55.833Z,
-//     sensorId: new ObjectId("63b0604c8f5849ccb350d035"),
-//     metaField: {
-//       incremental: 1,
-//       value: 200000,
-//       max: 200000,
-//       min: 200000,
-//       average: 200000
-//     },
-//     _id: new ObjectId("63b063832c4f359bf80d09df"),
-//     __v: 0
-//   },
-//   {
-//     timestamp: 2022-12-31T16:29:55.834Z,
-//     sensorId: new ObjectId("63b0604c8f5849ccb350d036"),
-//     metaField: {
-//       incremental: 1,
-//       value: 200000,
-//       max: 200000,
-//       min: 200000,
-//       average: 200000
-//     },
-//     _id: new ObjectId("63b063832c4f359bf80d09e0"),
-//     __v: 0
-//   },
-//   {
-//     timestamp: 2022-12-31T16:29:55.834Z,
-//     sensorId: new ObjectId("63b0604c8f5849ccb350d037"),
-//     metaField: {
-//       incremental: 1,
-//       value: 35.4,
-//       max: 35.4,
-//       min: 35.4,
-//       average: 35.4
-//     },
-//     _id: new ObjectId("63b063832c4f359bf80d09e1"),
-//     __v: 0
-//   }
-// ]
-// is device
-// end is true
-// { SMultiport: 1, Multiport: 1 }
+export interface elecChannels {
+  Ch1_7: number;
+  Ch8_14: number;
+  Ch15_21: number;
+}
