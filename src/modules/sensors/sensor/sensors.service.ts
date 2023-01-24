@@ -516,7 +516,9 @@ export class SensorsService {
         const ind = sens.sensors.findIndex(
           (item) => String(item._id) === SensorId,
         );
-        resultArray.push({ ...result?.[0], sensor: sens.sensors[ind] });
+        if (result?.[0]?.data.length > 0) {
+          resultArray.push({ ...result?.[0], sensor: sens.sensors[ind] });
+        }
       }),
     );
     return resultArray;
