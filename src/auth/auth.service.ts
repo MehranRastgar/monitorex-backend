@@ -23,6 +23,7 @@ export class AuthService {
     }
     return null;
   }
+  //....................................................................
   async login(user: any) {
     const payload = {
       name: user._doc.name,
@@ -30,21 +31,27 @@ export class AuthService {
       isAdmin: user._doc.isAdmin,
       accessControll: { ...user._doc.accessControll },
     };
-    console.log('login', user._doc);
+    // console.log('login', user._doc);
+    const token = this.jwtService.sign(payload);
+    const userObj = this.jwtService.decode(token);
+    console.log('what is here', userObj?.sub);
+    const userdata = await this.usersService.findOne(userObj?.sub);
+    userdata.password = '*******';
+    // const userdatawithoutpass: UserType = {
+    //   ...userdata.toJSON(),
+    //   password: '******',
+    // };
     return {
-      access_token: this.jwtService.sign(payload),
+      user: userdata.toJSON(),
+      access_token: token,
     };
   }
+  //....................................................................
   async isLogin(token: string) {
-    // const payload = {
-    //   name: user._doc.name,
-    //   sub: user._doc._id,
-    //   isAdmin: user._doc.isAdmin,
-    //   accessControll: { ...user._doc.accessControll },
-    // };
+    console.log('login ==============>', this.jwtService.decode(token));
 
-    console.log('login', this.jwtService.decode(token));
     return {
+      user: this.jwtService.decode(token),
       access_token: token,
     };
   }

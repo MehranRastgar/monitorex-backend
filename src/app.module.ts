@@ -31,6 +31,11 @@ import { DeviceSchema, ebSeries } from './modules/devices/devices.model';
   imports: [
     GatewayModule,
     QuizModule,
+    // MongooseModule.forRoot('mongodb://localhost:27017', {
+    //   dbName: 'monitorex',
+    //   retryAttempts: 5000,
+    //   retryDelay: 5000,
+    // }),
     MongooseModule.forRoot('mongodb://root:password@localhost:27018', {
       dbName: 'test',
       retryAttempts: 5000,

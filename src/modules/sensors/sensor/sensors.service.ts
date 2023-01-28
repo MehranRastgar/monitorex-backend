@@ -517,7 +517,11 @@ export class SensorsService {
           (item) => String(item._id) === SensorId,
         );
         if (result?.[0]?.data.length > 0) {
-          resultArray.push({ ...result?.[0], sensor: sens.sensors[ind] });
+          resultArray.push({
+            ...result?.[0],
+            sensor: sens.sensors[ind],
+            device: sens,
+          });
         }
       }),
     );

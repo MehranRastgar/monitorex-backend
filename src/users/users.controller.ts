@@ -92,15 +92,14 @@ export class UsersController {
   @Public()
   @UseGuards(LocalAuthGuard)
   @Post('login')
-  login(@Request() req): any {
-    return this.authService.login(req.user);
-    // return req.user;
+  async login(@Request() req): Promise<any> {
+    return await this.authService.login(req.user);
   }
 
   @Get('login/islogin')
-  isLogin(@Headers('authorization') authorization: string): any {
+  async isLogin(@Headers('authorization') authorization: string): Promise<any> {
     console.log('islogin called', authorization);
-    return this.authService.isLogin(authorization);
+    return await this.authService.isLogin(authorization);
     // return req.user;
   }
 }

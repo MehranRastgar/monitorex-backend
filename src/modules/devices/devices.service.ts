@@ -107,13 +107,14 @@ export class DevicesService {
           deviceId: device._id,
           sensorId: sensor._id,
           value: value,
+          max: sensor.maxAlarm,
+          min: sensor.minAlarm,
         });
         temp.save();
         // const lastData =
         const date = new Date();
         this.gateway.server.emit(String(device._id), temp);
         this.gateway.server.emit(String(sensor._id), temp);
-
         if (temp?.value > sensor.maxAlarm) {
           this.gateway.server.emit('alarms', {
             message: 'maximum Range',
@@ -153,6 +154,7 @@ export class DevicesService {
             (lastRec?.metaField?.incremental ?? 0) +
             value) /
           ((lastRec?.metaField?.incremental ?? 0) + 1);
+
         // console.log(averageCalc);
         const newRecord = new this.sensorseriesModel({
           timestamp: this.sensorsService.setToSecondZero(date),
