@@ -1,5 +1,7 @@
 import * as mongoose from 'mongoose';
 import { defineAbility, AbilityOptions } from '@casl/ability';
+import { SensorType } from 'src/modules/devices/devices.model';
+import { SensorSchema } from 'src/modules/sensors/sensor/sensor.model';
 
 export const UserSchema = new mongoose.Schema(
   {
@@ -36,6 +38,14 @@ export const UserSchema = new mongoose.Schema(
         enum: ['manage', 'create', 'read', 'update', 'delete'],
       },
     },
+    groups: [
+      {
+        groupTitle: { type: String },
+        sensors: [{ type: SensorSchema }],
+        timeRange: { type: String },
+      },
+    ],
+
     isAdmin: {
       type: Boolean,
       default: false,
@@ -53,6 +63,9 @@ export interface UserType {
   family: string;
   nationalId: string;
   personalId: string;
+  theme: 'dark' | 'light';
+  // chart: {};
+  groups: ReportSpec[];
   accessControll: {
     devices: abilityActionsType;
     users: abilityActionsType;
@@ -60,6 +73,12 @@ export interface UserType {
     reports: abilityActionsType;
   };
   isAdmin: isAdminType;
+}
+
+export interface ReportSpec {
+  groupTitle: string;
+  sensors: SensorType[];
+  timeRange: number;
 }
 
 export type isAdminType = boolean;

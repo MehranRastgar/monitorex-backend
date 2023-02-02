@@ -25,14 +25,35 @@ export class UsersService {
     // return `This action returns all users`;
   }
 
-  async findOne(id: number) {
-    const deviceId = new mongoose.Types.ObjectId(id);
-    return await this.userModel.findById(deviceId);
+  async findOne(id: string) {
+    const userId = new mongoose.Types.ObjectId(id);
+    return await this.userModel.findById(userId);
     // return `This action returns a #${id} user`;
   }
 
-  update(id: number, updateUserDto: UpdateUserDto) {
-    return `This action updates a #${id} user`;
+  async update(id: string, updateUserDto: UpdateUserDto) {
+    console.log(id);
+    console.log(updateUserDto);
+    const userId = new mongoose.Types.ObjectId(id);
+    const userData: UserType = await this.userModel.findById(userId);
+    const userDataUpdated: UserType = await this.userModel.findByIdAndUpdate(
+      userId,
+      {
+        $set: {
+          ...updateUserDto,
+          password: userData.password,
+          isAdmin: userData.isAdmin,
+          accessControll: userData.accessControll,
+        },
+      },
+      { new: true },
+    );
+
+    if (id === String(userDataUpdated._id)) {
+      return userDataUpdated;
+    } else {
+      return `This action updates a #${id} user`;
+    }
   }
 
   remove(id: number) {

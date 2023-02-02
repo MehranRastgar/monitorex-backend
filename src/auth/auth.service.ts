@@ -48,11 +48,26 @@ export class AuthService {
   }
   //....................................................................
   async isLogin(token: string) {
-    console.log('login ==============>', this.jwtService.decode(token));
-
+    console.log(
+      'login ==============>',
+      this.jwtService.decode(token.replace('Bearer ', ''), { json: true }),
+    );
+    const userDecodedToken: any = this.jwtService.decode(
+      token.replace('Bearer ', ''),
+      {
+        json: true,
+      },
+    );
+    let userData: any = {};
+    if (userDecodedToken?.sub !== undefined) {
+      console.log('is sub ready?????', userDecodedToken?.sub);
+      userData = (
+        await this.usersService.findOne(userDecodedToken?.sub)
+      ).toJSON();
+    }
     return {
-      user: this.jwtService.decode(token),
-      access_token: token,
+      user: { ...userData },
+      access_token: token.replace('Bearer ', ''),
     };
   }
 }

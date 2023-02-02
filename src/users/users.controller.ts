@@ -72,14 +72,14 @@ export class UsersController {
   @UseGuards(AbilityGuard)
   @CheckAbility({ action: AbilityAction.Read, subject: User })
   findOne(@Param('id') id: string) {
-    return this.usersService.findOne(+id);
+    return this.usersService.findOne(id);
   }
 
   @Patch(':id')
   @UseGuards(AbilityGuard)
   @CheckAbility({ action: AbilityAction.Update, subject: User })
   update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-    return this.usersService.update(+id, updateUserDto);
+    return this.usersService.update(id, updateUserDto);
   }
 
   @Delete(':id')
