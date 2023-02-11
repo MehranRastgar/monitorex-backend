@@ -36,7 +36,7 @@ export class UsersService {
     console.log(updateUserDto);
     const userId = new mongoose.Types.ObjectId(id);
     const userData: UserType = await this.userModel.findById(userId);
-    const userDataUpdated: UserType = await this.userModel.findByIdAndUpdate(
+    const userDataUpdated = await this.userModel.findByIdAndUpdate(
       userId,
       {
         $set: {
@@ -50,7 +50,10 @@ export class UsersService {
     );
 
     if (id === String(userDataUpdated._id)) {
-      return userDataUpdated;
+      // return userDataUpdated;
+      return {
+        user: { ...userDataUpdated.toJSON() },
+      };
     } else {
       return `This action updates a #${id} user`;
     }
