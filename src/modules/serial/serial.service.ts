@@ -7,6 +7,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Sensor, sensorseries } from '../sensors/sensor/sensor.model';
 import { DevicesService } from '../devices/devices.service';
+import { MyGateway } from '../gateway/gateway';
 
 const portname = 'COM4';
 const baudRate = 19200;
@@ -29,6 +30,7 @@ export class SerialService {
   constructor(
     private sensorsService: SensorsService,
     private devicesService: DevicesService,
+    private gateway: MyGateway,
   ) {
     // this.test_basic_connect();
     setInterval(() => this.test_basic_connect(), 3000);
@@ -158,6 +160,8 @@ export class SerialService {
   }
   //===========================================
   packetHandler(packet: string) {
+    this.gateway.server.emit('terminal', packet);
+
     if (packet.substring(0, 2) === 'f0') {
       const parsedPacket: ParsedDevicesData = this.parseSensorPacket(packet);
       const address = {
@@ -174,7 +178,7 @@ export class SerialService {
         Multiport: parsedPacket.addrMultiPort,
       };
       this.devicesService.addElectricalBoardSerries(address, packet);
-      console.log('is electrical');
+      // console.log('is electrical');
     }
     if (packet.substring(0, 2) === 'f5') {
       //ghat handler

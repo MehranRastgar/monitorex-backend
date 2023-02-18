@@ -80,7 +80,7 @@ export class DevicesService {
       // console.log('end is true');
     } else return;
 
-    console.log(address);
+    // console.log(address);
     const device = await this.deviceModel.findOne({
       'address.multiPort': address.Multiport,
       'address.sMultiPort': address.SMultiport,
@@ -91,7 +91,7 @@ export class DevicesService {
     const dev = device.toJSON();
     // console.log('dev.type', dev.type);
     if (dev?.type === 'Electrical panel') {
-      console.log('is tablo');
+      // console.log('is tablo');
       return;
     }
 
@@ -214,12 +214,12 @@ export class DevicesService {
   }
   //=============================================================================
   async ParseElectricalPacket(packet: string): Promise<elecChannels> {
-    console.log('eb===>>', packet);
+    // console.log('eb===>>', packet);
     const ETX: string = packet.substring(packet.length - 2, packet.length);
-    console.log(
-      'end of packet',
-      packet.substring(packet.length - 2, packet.length),
-    );
+    // console.log(
+    //   'end of packet',
+    //   packet.substring(packet.length - 2, packet.length),
+    // );
 
     if (ETX !== 'e6') {
       console.log('end of packet is damages');

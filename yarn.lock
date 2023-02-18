@@ -1408,6 +1408,11 @@
     "@jridgewell/resolve-uri" "3.1.0"
     "@jridgewell/sourcemap-codec" "1.4.14"
 
+"@lukeed/csprng@^1.0.0":
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/@lukeed/csprng/-/csprng-1.0.1.tgz#625e93a0edb2c830e3c52ce2d67b9d53377c6a66"
+  integrity sha512-uSvJdwQU5nK+Vdf6zxcWAY2A8r7uqe+gePwLWzJ+fsQehq18pc0I2hJKwypZ2aLM90+Er9u1xn4iLJPZ+xlL4g==
+
 "@nestjs/cli@^9.0.0":
   version "9.1.5"
   resolved "https://registry.yarnpkg.com/@nestjs/cli/-/cli-9.1.5.tgz#aa150991b209dc2b459c974cc1c43ea10a276ff8"
@@ -1437,13 +1442,13 @@
     webpack-node-externals "3.0.0"
 
 "@nestjs/common@^9.0.0":
-  version "9.2.1"
-  resolved "https://registry.yarnpkg.com/@nestjs/common/-/common-9.2.1.tgz#24de19ee85a8f1747288980fe517b12753cf66ea"
-  integrity sha512-nZuo3oDsSSlC5mti/M2aCWTEIfHPGDXmBwWgPeCpRbrNz3IWd109rkajll+yxgidVjznAdBS9y00JkAVJblNYw==
+  version "9.3.9"
+  resolved "https://registry.yarnpkg.com/@nestjs/common/-/common-9.3.9.tgz#170201ce1c2a8f73bd4babe74b64a2a0b37a95d0"
+  integrity sha512-GshTD9Xz+wD2em6NyzU4NXw5IXMUmapgDgD+iuj6XL0258hvDwODmNk37mBBnZvTZlqER+krvIUKnS34etqF/A==
   dependencies:
+    uid "2.0.1"
     iterare "1.2.1"
-    tslib "2.4.1"
-    uuid "9.0.0"
+    tslib "2.5.0"
 
 "@nestjs/config@^2.2.0":
   version "2.2.0"
@@ -1456,17 +1461,16 @@
     uuid "8.3.2"
 
 "@nestjs/core@^9.0.0":
-  version "9.2.1"
-  resolved "https://registry.yarnpkg.com/@nestjs/core/-/core-9.2.1.tgz#598e51a421a0aaafc568c1a02499f7c1f9491caf"
-  integrity sha512-a9GkXuu8uXgNgCVW+17iI8kLCltO+HwHpU2IhR+32JKnN2WEQ1YEWU4t3GJ2MNq44YkjIw9zrKvFkjJBlYrNbQ==
+  version "9.3.9"
+  resolved "https://registry.yarnpkg.com/@nestjs/core/-/core-9.3.9.tgz#694caf785e0209175479637f11be79a930d0c0d6"
+  integrity sha512-9g1A1G9eirLXEpH21rc6dKb08zHc2+adhCRz8NW39hbejcsxxD72FApJzt4QBQAKvu862ixt/tdpStnFT7lOSw==
   dependencies:
+    uid "2.0.1"
     "@nuxtjs/opencollective" "0.3.2"
     fast-safe-stringify "2.1.1"
     iterare "1.2.1"
-    object-hash "3.0.0"
     path-to-regexp "3.2.0"
-    tslib "2.4.1"
-    uuid "9.0.0"
+    tslib "2.5.0"
 
 "@nestjs/jwt@^10.0.1":
   version "10.0.1"
@@ -1475,6 +1479,11 @@
   dependencies:
     "@types/jsonwebtoken" "8.5.9"
     jsonwebtoken "9.0.0"
+
+"@nestjs/mapped-types@1.2.2":
+  version "1.2.2"
+  resolved "https://registry.yarnpkg.com/@nestjs/mapped-types/-/mapped-types-1.2.2.tgz#d9ddb143776e309dbc1a518ac1607fddac1e140e"
+  integrity sha512-3dHxLXs3M0GPiriAcCFFJQHoDFUuzTD5w6JDhE7TyfT89YKpe6tcCCIqOZWdXmt9AZjjK30RkHRSFF+QEnWFQg==
 
 "@nestjs/mapped-types@^1.2.0":
   version "1.2.0"
@@ -1520,6 +1529,17 @@
     fs-extra "10.1.0"
     jsonc-parser "3.2.0"
     pluralize "8.0.0"
+
+"@nestjs/swagger@^6.2.1":
+  version "6.2.1"
+  resolved "https://registry.yarnpkg.com/@nestjs/swagger/-/swagger-6.2.1.tgz#38caa76ac00993ddc11a79dd24ab9f4392d2791d"
+  integrity sha512-9M2vkfJHIzLqDZwvM5TEZO0MxRCvIb0xVy0LsmWwxH1lrb0z/4MhU+r2CWDhBtTccVJrKxVPiU2s3T3b9uUJbg==
+  dependencies:
+    "@nestjs/mapped-types" "1.2.2"
+    js-yaml "4.1.0"
+    lodash "4.17.21"
+    path-to-regexp "3.2.0"
+    swagger-ui-dist "4.15.5"
 
 "@nestjs/testing@^9.0.0":
   version "9.2.1"
@@ -1881,6 +1901,13 @@
   version "3.0.1"
   resolved "https://registry.yarnpkg.com/@types/mime/-/mime-3.0.1.tgz#5f8f2bca0a5863cb69bc0b0acd88c96cb1d4ae10"
   integrity sha512-Y4XFY5VJAuw0FgAqPNd6NNoV44jbq9Bz2L7Rh/J6jLTiHBSBJa9fxqQIvkIld4GsoDOcCbvzOUAbLPsSKKg+uA==
+
+"@types/mongoose@^5.11.97":
+  version "5.11.97"
+  resolved "https://registry.yarnpkg.com/@types/mongoose/-/mongoose-5.11.97.tgz#80b0357f3de6807eb597262f52e49c3e13ee14d8"
+  integrity sha512-cqwOVYT3qXyLiGw7ueU2kX9noE8DPGRY6z8eUxudhXY8NZ7DMKYAxyZkLSevGfhCX3dO/AoX5/SO9lAzfjon0Q==
+  dependencies:
+    mongoose "*"
 
 "@types/node@*":
   version "18.11.14"
@@ -4328,6 +4355,13 @@ js-tokens@^4.0.0:
   resolved "https://registry.yarnpkg.com/js-tokens/-/js-tokens-4.0.0.tgz#19203fb59991df98e3a287050d4647cdeaf32499"
   integrity sha512-RdJUflcE3cUzKiMqQgsCu06FPu9UdIJO0beYbPhHN4k6apgJtifcoCtT9bcxOpYBtpD2kCM6Sbzg4CausW/PKQ==
 
+js-yaml@4.1.0, js-yaml@^4.1.0:
+  version "4.1.0"
+  resolved "https://registry.yarnpkg.com/js-yaml/-/js-yaml-4.1.0.tgz#c1fb65f8f5017901cdd2c951864ba18458a10602"
+  integrity sha512-wpxZs9NoxZaJESJGIZTyDEaYpl0FKSA+FB9aJiyemKhMwkxQg63h4T1KJgUGHpTqPDNRcmmYLugrRjJlBtWvRA==
+  dependencies:
+    argparse "^2.0.1"
+
 js-yaml@^3.13.1:
   version "3.14.1"
   resolved "https://registry.yarnpkg.com/js-yaml/-/js-yaml-3.14.1.tgz#dae812fdb3825fa306609a8717383c50c36a0537"
@@ -4335,13 +4369,6 @@ js-yaml@^3.13.1:
   dependencies:
     argparse "^1.0.7"
     esprima "^4.0.0"
-
-js-yaml@^4.1.0:
-  version "4.1.0"
-  resolved "https://registry.yarnpkg.com/js-yaml/-/js-yaml-4.1.0.tgz#c1fb65f8f5017901cdd2c951864ba18458a10602"
-  integrity sha512-wpxZs9NoxZaJESJGIZTyDEaYpl0FKSA+FB9aJiyemKhMwkxQg63h4T1KJgUGHpTqPDNRcmmYLugrRjJlBtWvRA==
-  dependencies:
-    argparse "^2.0.1"
 
 jsesc@^2.5.1:
   version "2.5.2"
@@ -4428,6 +4455,11 @@ kareem@2.5.0:
   version "2.5.0"
   resolved "https://registry.yarnpkg.com/kareem/-/kareem-2.5.0.tgz#9d2b2272609b0d5b981757fa5794d7ad0ac041b2"
   integrity sha512-rVBUGGwvqg130iwYu8k7lutHuDBFj1yGRdnlE44wEhxAmFBad1zcL66PdWC1raw3tIObY6XWhtv3VL04xQb/cg==
+
+kareem@2.5.1:
+  version "2.5.1"
+  resolved "https://registry.yarnpkg.com/kareem/-/kareem-2.5.1.tgz#7b8203e11819a8e77a34b3517d3ead206764d15d"
+  integrity sha512-7jFxRVm+jD+rkq3kY0iZDJfsO2/t4BBPeEb2qKn2lR/9KhuksYk5hxzfRYWMPV8P/x2d0kHD306YyWLzjjH+uA==
 
 kleur@^3.0.3:
   version "3.0.3"
@@ -4665,12 +4697,37 @@ mongodb@4.12.1:
     "@aws-sdk/credential-providers" "^3.186.0"
     saslprep "^1.0.3"
 
+mongodb@4.13.0:
+  version "4.13.0"
+  resolved "https://registry.yarnpkg.com/mongodb/-/mongodb-4.13.0.tgz#2aa832b827e2891eb2e52e8235c201cbb4701ed2"
+  integrity sha512-+taZ/bV8d1pYuHL4U+gSwkhmDrwkWbH1l4aah4YpmpscMwgFBkufIKxgP/G7m87/NUuQzc2Z75ZTI7ZOyqZLbw==
+  dependencies:
+    bson "^4.7.0"
+    mongodb-connection-string-url "^2.5.4"
+    socks "^2.7.1"
+  optionalDependencies:
+    "@aws-sdk/credential-providers" "^3.186.0"
+    saslprep "^1.0.3"
+
 mongoose-timeseries@^1.3.0:
   version "1.3.0"
   resolved "https://registry.yarnpkg.com/mongoose-timeseries/-/mongoose-timeseries-1.3.0.tgz#c36bf0ed50e35584b773ca4c296e29c1b71910d5"
   integrity sha512-f6dFNr0REn+RM2S+e7orTBF2H7lp5P3QQTfrw4o21Yvp1sLQ42UypOOr5VtbA+BiSXyLF1v9hJJvLqMJUrO76Q==
   dependencies:
     mongoose "4.5.8"
+
+mongoose@*:
+  version "6.9.1"
+  resolved "https://registry.yarnpkg.com/mongoose/-/mongoose-6.9.1.tgz#4c6648806fb89b8d8aa4fc60ddc490442c971057"
+  integrity sha512-hOz1ZWV0w6WEVLrj89Wpk7PXDYtDDF6k7/NX79lY5iKqeFtZsceBXW8xW59YFNcW5O3cH32hQ8IbDlhgyBsDMA==
+  dependencies:
+    bson "^4.7.0"
+    kareem "2.5.1"
+    mongodb "4.13.0"
+    mpath "0.9.0"
+    mquery "4.0.3"
+    ms "2.1.3"
+    sift "16.0.1"
 
 mongoose@4.5.8:
   version "4.5.8"
@@ -4816,9 +4873,9 @@ node-emoji@1.11.0:
     lodash "^4.17.21"
 
 node-fetch@^2.6.1:
-  version "2.6.7"
-  resolved "https://registry.yarnpkg.com/node-fetch/-/node-fetch-2.6.7.tgz#24de9fba827e3b4ae44dc8b20256a379160052ad"
-  integrity sha512-ZjMPFEfVx5j+y2yF35Kzx5sF7kDzxuDj6ziH4FFbOp87zKDZNx8yExJIb05OGF4Nlt9IHFIMBkRl41VdvcNdbQ==
+  version "2.6.9"
+  resolved "https://registry.yarnpkg.com/node-fetch/-/node-fetch-2.6.9.tgz#7c7f744b5cc6eb5fd404e0c7a9fec630a55657e6"
+  integrity sha512-DJm/CJkZkRjKKj4Zi4BsKVZh3ValV5IR5s7LVZnW+6YMh0W1BfNA8XSs6DLMGYlId5F3KnA70uu2qepcR08Qqg==
   dependencies:
     whatwg-url "^5.0.0"
 
@@ -5730,6 +5787,11 @@ supports-preserve-symlinks-flag@^1.0.0:
   resolved "https://registry.yarnpkg.com/supports-preserve-symlinks-flag/-/supports-preserve-symlinks-flag-1.0.0.tgz#6eda4bd344a3c94aea376d4cc31bc77311039e09"
   integrity sha512-ot0WnXS9fgdkgIcePe6RHNk1WA8+muPa6cSjeR3V8K27q9BB1rTE3R1p7Hv0z1ZyAc8s6Vvv8DIyWf681MAt0w==
 
+swagger-ui-dist@4.15.5:
+  version "4.15.5"
+  resolved "https://registry.yarnpkg.com/swagger-ui-dist/-/swagger-ui-dist-4.15.5.tgz#cda226a79db2a9192579cc1f37ec839398a62638"
+  integrity sha512-V3eIa28lwB6gg7/wfNvAbjwJYmDXy1Jo1POjyTzlB6wPcHiGlRxq39TSjYGVjQrUSAzpv+a7nzp7mDxgNy57xA==
+
 symbol-observable@4.0.0:
   version "4.0.0"
   resolved "https://registry.yarnpkg.com/symbol-observable/-/symbol-observable-4.0.0.tgz#5b425f192279e87f2f9b937ac8540d1984b39205"
@@ -5909,6 +5971,11 @@ tslib@2.4.1, tslib@^2.1.0, tslib@^2.3.1:
   resolved "https://registry.yarnpkg.com/tslib/-/tslib-2.4.1.tgz#0d0bfbaac2880b91e22df0768e55be9753a5b17e"
   integrity sha512-tGyy4dAjRIEwI7BzsB0lynWgOpfqjUdq91XXAlIWD2OwKBH7oCl/GZG/HT4BOHrTlPMOASlMQ7veyTqpmRcrNA==
 
+tslib@2.5.0:
+  version "2.5.0"
+  resolved "https://registry.yarnpkg.com/tslib/-/tslib-2.5.0.tgz#42bfed86f5787aeb41d031866c8f402429e0fddf"
+  integrity sha512-336iVw3rtn2BUK7ORdIAHTyxHGRIHVReokCR3XjbckJMK7ms8FysBfhLR8IXnAgy7T0PTPNBWKiH514FOW/WSg==
+
 tslib@^1.11.1, tslib@^1.8.1, tslib@^1.9.0:
   version "1.14.1"
   resolved "https://registry.yarnpkg.com/tslib/-/tslib-1.14.1.tgz#cf2d38bdc34a134bcaf1091c41f6619e2f672d00"
@@ -5966,6 +6033,13 @@ typescript@^4.7.4:
   resolved "https://registry.yarnpkg.com/typescript/-/typescript-4.9.4.tgz#a2a3d2756c079abda241d75f149df9d561091e78"
   integrity sha512-Uz+dTXYzxXXbsFpM86Wh3dKCxrQqUcVMxwU54orwlJjOpO3ao8L7j5lH+dWfTwgCwIuM9GQ2kvVotzYJMXTBZg==
 
+uid@2.0.1:
+  version "2.0.1"
+  resolved "https://registry.yarnpkg.com/uid/-/uid-2.0.1.tgz#a3f57c962828ea65256cd622fc363028cdf4526b"
+  integrity sha512-PF+1AnZgycpAIEmNtjxGBVmKbZAQguaa4pBUq6KNaGEcpzZ2klCNZLM34tsjp76maN00TttiiUf6zkIBpJQm2A==
+  dependencies:
+    "@lukeed/csprng" "^1.0.0"
+
 universalify@^2.0.0:
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/universalify/-/universalify-2.0.0.tgz#75a4984efedc4b08975c5aeb73f530d02df25717"
@@ -6005,11 +6079,6 @@ uuid@8.3.2, uuid@^8.3.2:
   version "8.3.2"
   resolved "https://registry.yarnpkg.com/uuid/-/uuid-8.3.2.tgz#80d5b5ced271bb9af6c445f21a1a04c606cefbe2"
   integrity sha512-+NYs2QeMWy+GWFOEm9xnn6HCDp0l7QBD7ml8zLUmJ+93Q5NF0NocErnwkTkXVFNiX3/fpC6afS8Dhb/gz7R7eg==
-
-uuid@9.0.0:
-  version "9.0.0"
-  resolved "https://registry.yarnpkg.com/uuid/-/uuid-9.0.0.tgz#592f550650024a38ceb0c562f2f6aa435761efb5"
-  integrity sha512-MXcSTerfPa4uqyzStbRoTgt5XIe3x5+42+q1sDuy3R5MDk66URdLMOZe5aPX/SQd+kuYAh0FdP/pO28IkQyTeg==
 
 v8-compile-cache-lib@^3.0.1:
   version "3.0.1"

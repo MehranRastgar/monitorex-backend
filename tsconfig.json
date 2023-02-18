@@ -17,6 +17,10 @@
     "strictBindCallApply": false,
     "forceConsistentCasingInFileNames": false,
     "noFallthroughCasesInSwitch": false,
-    "esModuleInterop": true
-  }
+    "esModuleInterop": true,
+    "paths": {
+      "@nestjs/*": ["node_modules/@nestjs/*"]
+    }
+  },
+  "exclude": ["node_modules", "dist"]
 }

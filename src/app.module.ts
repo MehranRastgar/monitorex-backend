@@ -26,6 +26,7 @@ import { UserSchema } from './users/user.model';
 import { JwtModule, JwtService } from '@nestjs/jwt/dist';
 import { JwtAuthGuard } from './auth/jwt-auth.guard';
 import { DeviceSchema, ebSeries } from './modules/devices/devices.model';
+import { Logger } from '@nestjs/common';
 
 @Module({
   imports: [
