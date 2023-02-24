@@ -74,3 +74,5 @@ Nest is [MIT licensed](LICENSE).
 
 nest g co quizcontroller/modules/quiz
 nest g mo modules/quiz
+
+pm2 start dist/main.js --name moback

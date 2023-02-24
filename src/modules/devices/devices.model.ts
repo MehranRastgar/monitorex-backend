@@ -101,12 +101,14 @@ export const TempDevicesSchema = new mongoose.Schema({
     autopopulate: true,
   },
   sensorId: mongoose.Schema.Types.ObjectId,
+  sensorTitle: { type: String },
   value: { type: Number },
   createdAt: { type: Date, expires: 120, default: Date.now },
 });
 export interface TempDevice {
   deviceId: Device;
   sensorId: mongoose.Schema.Types.ObjectId;
+  sensorTitle?: string;
   value: number;
   createdAt: Date;
 }

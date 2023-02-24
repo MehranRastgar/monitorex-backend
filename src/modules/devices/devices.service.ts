@@ -106,11 +106,12 @@ export class DevicesService {
         const temp = new this.tempDeviceModel({
           deviceId: device._id,
           sensorId: sensor._id,
+          sensorTitle: sensor?.title,
           value: value,
           max: sensor.maxAlarm,
           min: sensor.minAlarm,
         });
-        temp.save();
+        // temp.save();
         // const lastData =
         const date = new Date();
         this.gateway.server.emit(String(device._id), temp);
