@@ -54,7 +54,8 @@ export class UsersController {
     // ).toString(),
     // const user: UserType = await this.userModel.findById('');
     // const ability = this.abilityFactory.defineAbility(user);
-    return this.usersService.create(createUserDto);
+    const newRecord = await this.usersService.create(createUserDto);
+    return newRecord;
   }
 
   @Get()
@@ -65,28 +66,28 @@ export class UsersController {
     // const ability = this.abilityFactory.defineAbility(user);
 
     // const isAllowed = ability.can(AbilityAction.Create, User);
-    return this.usersService.findAll();
+    return await this.usersService.findAll();
   }
 
   @Get(':id')
   @UseGuards(AbilityGuard)
   @CheckAbility({ action: AbilityAction.Read, subject: User })
-  findOne(@Param('id') id: string) {
-    return this.usersService.findOne(id);
+  async findOne(@Param('id') id: string) {
+    return await this.usersService.findOne(id);
   }
 
   @Patch(':id')
   @UseGuards(AbilityGuard)
   @CheckAbility({ action: AbilityAction.Update, subject: User })
-  update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-    return this.usersService.update(id, updateUserDto);
+  async update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
+    return await this.usersService.update(id, updateUserDto);
   }
 
   @Delete(':id')
   @UseGuards(AbilityGuard)
-  @CheckAbility({ action: AbilityAction.Manage, subject: User })
-  remove(@Param('id') id: string) {
-    return this.usersService.remove(+id);
+  @CheckAbility({ action: AbilityAction.Admin, subject: User })
+  async remove(@Param('id') id: string) {
+    return await this.usersService.remove(id);
   }
 
   @Public()

@@ -36,12 +36,20 @@ import { Logger } from '@nestjs/common';
     //   dbName: 'monitorex',
     //   retryAttempts: 5000,
     //   retryDelay: 5000,
-    // }),
+    // }),root:password
     MongooseModule.forRoot('mongodb://root:password@localhost:27018', {
       dbName: 'test',
       retryAttempts: 5000,
       retryDelay: 5,
     }),
+    // MongooseModule.forRoot(
+    //   'mongodb+srv://root:mehran@cluster0.ie3amiu.mongodb.net/?retryWrites=true&w=majority',
+    //   {
+    //     dbName: 'monitorex',
+    //     retryAttempts: 5000,
+    //     retryDelay: 5,
+    //   },
+    // ),
     SensorsModule,
     DevicesModule,
     SerialModule,

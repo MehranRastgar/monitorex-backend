@@ -1,7 +1,11 @@
 import * as mongoose from 'mongoose';
 import { defineAbility, AbilityOptions } from '@casl/ability';
-import { SensorType } from 'src/modules/devices/devices.model';
-import { SensorSchema } from 'src/modules/sensors/sensor/sensor.model';
+import {
+  SensorType,
+  SensorSchema,
+  DeviceSchema,
+} from 'src/modules/devices/devices.model';
+// import { SensorSchema } from 'src/modules/sensors/sensor/sensor.model';
 
 export const UserSchema = new mongoose.Schema(
   {
@@ -40,17 +44,20 @@ export const UserSchema = new mongoose.Schema(
     },
     groups: [
       {
+        // type: mongoose.Types.ObjectId,
+        // ref: 'Device',
+        // autopopulate: true,
         groupTitle: { type: String },
         sensors: [{ type: SensorSchema }],
         timeRange: { type: String },
       },
     ],
-
     isAdmin: {
       type: Boolean,
       default: false,
       required: true,
     },
+    email: { type: String },
   },
   { timestamps: true },
 );
@@ -72,6 +79,7 @@ export interface UserType {
     profile: abilityActionsType;
     reports: abilityActionsType;
   };
+  email: string;
   isAdmin: isAdminType;
 }
 
@@ -83,12 +91,14 @@ export interface ReportSpec {
 
 export type isAdminType = boolean;
 export type abilityActionsType =
+  | 'admin'
   | 'manage'
   | 'create'
   | 'read'
   | 'update'
   | 'delete';
 export enum AbilityAction {
+  Admin = 'admin',
   Manage = 'manage',
   Create = 'create',
   Read = 'read',

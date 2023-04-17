@@ -76,3 +76,78 @@ nest g co quizcontroller/modules/quiz
 nest g mo modules/quiz
 
 pm2 start dist/main.js --name moback
+
+//for seasoning database
+yarn add moment
+
+import _ as mongoose from 'mongoose';
+import _ as moment from 'moment';
+
+const dbName = `monitorex-${moment().format('YYYY-MM')}`;
+
+export const databaseProviders = [
+{
+provide: 'DATABASE_CONNECTION',
+useFactory: (): Promise<typeof mongoose> =>
+mongoose.connect(`mongodb://localhost/${dbName}`, {
+useNewUrlParser: true,
+useUnifiedTopology: true,
+}),
+},
+];
+
+In this example, we are using the moment library to generate the current year and month, and then we are using that to construct the database name. For example, if the current date is February 2023, the database name will be myapp-2023-02.
+
+import { Module } from '@nestjs/common';
+import { AppController } from './app.controller';
+import { AppService } from './app.service';
+import { databaseProviders } from './database.providers';
+
+@Module({
+imports: [],
+controllers: [AppController],
+providers: [AppService, ...databaseProviders],
+})
+export class AppModule {}
+
+import { Injectable, Inject } from '@nestjs/common';
+import { Model } from 'mongoose';
+import \* as moment from 'moment';
+import { DATABASE_CONNECTION } from './database.constants';
+import { User } from './user.schema';
+
+@Injectable()
+export class UserService {
+private seasonDbName: string;
+
+constructor(@Inject(DATABASE_CONNECTION) private connection) {
+this.seasonDbName = `myapp-${moment().format('YYYY-MM')}`;
+}
+
+async findUsers(): Promise<User[]> {
+const seasonDb = this.connection.useDb(this.seasonDbName);
+const UserModel: Model<User> = seasonDb.model<User>('User', UserSchema);
+const users = await UserModel.find().exec();
+return users;
+}
+}
+
+//for query of databases list
+
+import { Injectable, Inject } from '@nestjs/common';
+import { Db } from 'mongodb';
+import { DATABASE_CONNECTION } from './database.constants';
+
+@Injectable()
+export class SeasonService {
+constructor(@Inject(DATABASE_CONNECTION) private connection) {}
+
+async findSeasons(): Promise<string[]> {
+const adminDb: Db = this.connection.db.admin();
+const databases = await adminDb.listDatabases();
+const seasonNames = databases.databases
+.map((db) => db.name)
+.filter((name) => name.startsWith('myapp-'));
+return seasonNames;
+}
+}

@@ -31,7 +31,7 @@ export const ElectricalSchema = new mongoose.Schema({
   lastStatus: { type: Boolean },
 });
 
-const SensorSchema = new mongoose.Schema(
+export const SensorSchema = new mongoose.Schema(
   {
     // deviceId: {
     //   type: mongoose.Types.ObjectId,
@@ -77,7 +77,6 @@ export const DeviceSchema = new mongoose.Schema(
       type: Number,
       required: true,
       validator: true,
-      enum: [1, 2, 3, 4, 5, 6, 7, 8],
     },
     sensors: [SensorSchema],
     sensorLastSerie: [sensorseries],
@@ -88,6 +87,8 @@ export const DeviceSchema = new mongoose.Schema(
     //     autopopulate: true,
     //   },
     // },
+    electricalId: { type: String },
+    electricalPort: { type: Number },
     electricals: [ElectricalSchema],
     factors: [factorsSchema],
   },
@@ -102,6 +103,7 @@ export const TempDevicesSchema = new mongoose.Schema({
   },
   sensorId: mongoose.Schema.Types.ObjectId,
   sensorTitle: { type: String },
+  deviceTitle: { type: String },
   value: { type: Number },
   createdAt: { type: Date, expires: 120, default: Date.now },
 });
@@ -109,6 +111,7 @@ export interface TempDevice {
   deviceId: Device;
   sensorId: mongoose.Schema.Types.ObjectId;
   sensorTitle?: string;
+  deviceTitle?: string;
   value: number;
   createdAt: Date;
 }
@@ -143,7 +146,10 @@ export interface Device {
   factors: factors[];
   sensors: Sensor[];
   electricals: ElectricalPanelType[];
+  numberOfPorts: number;
   sensorLastSerie?: sensorseries;
+  electricalId?: string;
+  electricalPort?: number;
 }
 export interface Sensor {
   _id: mongoose.Schema.Types.ObjectId;

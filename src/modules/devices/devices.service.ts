@@ -88,7 +88,7 @@ export class DevicesService {
     if (device === null) {
       return;
     }
-    const dev = device.toJSON();
+    const dev = device?.toJSON();
     // console.log('dev.type', dev.type);
     if (dev?.type === 'Electrical panel') {
       // console.log('is tablo');
@@ -104,16 +104,20 @@ export class DevicesService {
         const value: number = parsedPacket.sensors[index];
 
         const temp = new this.tempDeviceModel({
-          deviceId: device._id,
-          sensorId: sensor._id,
+          deviceId: device?._id,
+          sensorId: sensor?._id,
           sensorTitle: sensor?.title,
+          deviceTitle: device?.title,
           value: value,
-          max: sensor.maxAlarm,
-          min: sensor.minAlarm,
+          max: sensor?.maxAlarm,
+          min: sensor?.minAlarm,
         });
         // temp.save();
         // const lastData =
         const date = new Date();
+        if (device?._id === undefined) {
+          return;
+        }
         this.gateway.server.emit(String(device._id), temp);
         this.gateway.server.emit(String(sensor._id), temp);
         if (temp?.value > sensor.maxAlarm) {
@@ -252,16 +256,16 @@ export class DevicesService {
       'address.multiPort': address.Multiport,
       'address.sMultiPort': address.SMultiport,
     });
-    const dev = device.toJSON();
+    const dev = device?.toJSON();
     const str: elecChannels = await this.ParseElectricalPacket(packet);
     const dateRef = new Date();
     dateRef.setMilliseconds(0);
     dateRef.setSeconds(0);
     const lastRec = await this.ebModel
-      .findOne({ deviceId: device._id })
+      .findOne({ deviceId: device?._id })
       .sort({ timestamp: -1 });
     const newSerie = new this.ebModel({
-      deviceId: device._id,
+      deviceId: device?._id,
       timestamp: dateRef,
       metaField: {
         byte1: str.Ch1_7,
@@ -278,6 +282,9 @@ export class DevicesService {
       newSerie.metaField.byte3 !== lastRec.metaField.byte3
     ) {
       await newSerie.save();
+    }
+    if (device?._id === undefined) {
+      return;
     }
     this.gateway.server.emit(String(device._id), newSerie);
     // console.log(str, dev);
