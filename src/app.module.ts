@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, CacheModule } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { QuizModule } from './modules/quiz/quiz.module';
@@ -31,6 +31,10 @@ import { ConfigModule } from '@nestjs/config';
 
 @Module({
   imports: [
+    CacheModule.register({
+      ttl: 1000 * 60, // default TTL of 1 hour
+      max: 1000, // max number of items in cache
+    }),
     ConfigModule.forRoot(),
     GatewayModule,
     QuizModule,

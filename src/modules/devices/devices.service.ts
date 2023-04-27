@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Inject, CACHE_MANAGER } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import mongoose, { Model } from 'mongoose';
 import { MyGateway } from '../gateway/gateway';
@@ -6,6 +6,7 @@ import { Sensor, sensorseries } from '../sensors/sensor/sensor.model';
 import { SensorsService } from '../sensors/sensor/sensors.service';
 import { ParsedDevicesData } from '../serial/serial.service';
 import { Device, ebSeries, SensorType, TempDevice } from './devices.model';
+import { Cache } from 'cache-manager';
 
 @Injectable()
 export class DevicesService {
@@ -19,6 +20,7 @@ export class DevicesService {
     private readonly tempDeviceModel: Model<TempDevice>,
     private sensorsService: SensorsService,
     private gateway: MyGateway,
+    @Inject(CACHE_MANAGER) private readonly cacheManager: Cache,
   ) {}
   //=============================================================================
   async insertDevice(DeviceData: Device): Promise<Device | string> {
@@ -30,6 +32,7 @@ export class DevicesService {
       return 'err:' + JSON.stringify(err);
     }
   }
+  //=============================================================================
   async getDevices(query: any) {
     try {
       const devices = this.deviceModel.find();
@@ -68,6 +71,51 @@ export class DevicesService {
     }
   }
   //=============================================================================
+  async getDeviceFromCacheOrDb(address: {
+    Multiport: number;
+    SMultiport: number;
+  }): Promise<any> {
+    const cacheKey = `device-${address.Multiport}-${address.SMultiport}`;
+    const cachedDevice = await this.cacheManager.get(cacheKey);
+    if (cachedDevice) {
+      console.log('device loaded from cache ');
+      return cachedDevice;
+    }
+
+    const device = await this.deviceModel
+      .findOne({
+        'address.multiPort': address.Multiport,
+        'address.sMultiPort': address.SMultiport,
+      })
+      .exec();
+
+    if (device) {
+      await this.cacheManager.set(cacheKey, device, 1000 * 60); // cache for 1 minute
+    }
+
+    return device;
+  }
+  //=============================================================================
+  async getLastSensorSeriesFromCacheOrDB(sensor: any): Promise<any> {
+    const cacheKey = `series-${sensor?._id}`;
+    const cachedDevice = await this.cacheManager.get(cacheKey);
+    if (cachedDevice) {
+      console.log('series loaded from cache ');
+      return cachedDevice;
+    }
+
+    const serie = await this.sensorseriesModel
+      .findOne({ sensorId: sensor._id })
+      .sort({ timestamp: -1 })
+      .exec();
+
+    if (serie) {
+      await this.cacheManager.set(cacheKey, serie, 1000 * 45); // cache for 1 minute
+    }
+
+    return serie;
+  }
+  //=============================================================================
   async addRecordSeriesWithDevice(
     address: { SMultiport: number; Multiport: number },
     parsedPacket: ParsedDevicesData,
@@ -81,10 +129,13 @@ export class DevicesService {
     } else return;
 
     // console.log(address);
-    const device = await this.deviceModel.findOne({
-      'address.multiPort': address.Multiport,
-      'address.sMultiPort': address.SMultiport,
-    });
+
+    const device = await this.getDeviceFromCacheOrDb(address);
+    // const device = await this.deviceModel.findOne({
+    //   'address.multiPort': address.Multiport,
+    //   'address.sMultiPort': address.SMultiport,
+    // });
+
     if (device === null) {
       return;
     }
@@ -136,9 +187,11 @@ export class DevicesService {
             sensorTitle: sensor.title,
           });
         }
-        const lastRec = await this.sensorseriesModel
-          .findOne({ sensorId: sensor._id })
-          .sort({ timestamp: -1 });
+        const lastRec = await this.getLastSensorSeriesFromCacheOrDB(sensor);
+        // const lastRec = await this.sensorseriesModel
+        //   .findOne({ sensorId: sensor._id })
+        //   .sort({ timestamp: -1 });
+        // const lastRec = null;
         // const sensorSettings = await this.sensorModel.findOne({
         //   sensorUniqueName: sensorAddress,
         // });
@@ -200,11 +253,6 @@ export class DevicesService {
         { new: true },
       );
 
-      // console.log(
-      //   '=================>>>>>>>>>>>>>>>>>>>>>>',
-      //   makeSensorMany.length,
-      //   makeSensorslastSeries.length,
-      // );
       return many;
     } catch (e) {
       console.log(e);

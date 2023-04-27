@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Inject, CACHE_MANAGER } from '@nestjs/common';
 import { PacketLengthParser, ReadlineParser, SerialPort } from 'serialport';
 import { DelimiterParser } from '@serialport/parser-delimiter';
 import { TransformOptions } from 'stream';
@@ -8,6 +8,7 @@ import { Model } from 'mongoose';
 import { Sensor, sensorseries } from '../sensors/sensor/sensor.model';
 import { DevicesService } from '../devices/devices.service';
 import { MyGateway } from '../gateway/gateway';
+import { Cache } from 'cache-manager';
 
 // const portname = '/dev/ttyUSB0' ?? process.env.SERIAL_PORT_NAME;
 const baudRate = 19200;
@@ -31,6 +32,7 @@ export class SerialService {
     private sensorsService: SensorsService,
     private devicesService: DevicesService,
     private gateway: MyGateway,
+    @Inject(CACHE_MANAGER) private readonly cacheManager: Cache,
   ) {
     // this.test_basic_connect();
     setInterval(() => this.test_basic_connect(), 3000);

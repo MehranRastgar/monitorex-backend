@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, CacheModule } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { MyGateway } from '../gateway/gateway';
 import { GatewayModule } from '../gateway/gateway.module';
@@ -10,6 +10,10 @@ import { DevicesService } from './devices.service';
 
 @Module({
   imports: [
+    CacheModule.register({
+      ttl: 60 * 1000, // the time-to-live (TTL) for cached items in seconds
+      max: 1000, // the maximum number of items that can be stored in the cache at one time
+    }),
     GatewayModule,
     MongooseModule.forFeature([
       { name: 'Device', schema: DeviceSchema },
