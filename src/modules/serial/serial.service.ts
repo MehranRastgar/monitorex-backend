@@ -9,7 +9,7 @@ import { Sensor, sensorseries } from '../sensors/sensor/sensor.model';
 import { DevicesService } from '../devices/devices.service';
 import { MyGateway } from '../gateway/gateway';
 
-const portname = 'COM4';
+// const portname = '/dev/ttyUSB0' ?? process.env.SERIAL_PORT_NAME;
 const baudRate = 19200;
 //===========================================
 interface DelimiterOptions extends TransformOptions {
@@ -37,8 +37,8 @@ export class SerialService {
     // let mybuffer: string[] = [];
   }
   port = new SerialPort({
-    path: portname,
-    baudRate: baudRate,
+    path: process.env.SERIAL_PORT_NAME,
+    baudRate: parseInt(process.env.SERIAL_BUADRATE) ?? baudRate,
     autoOpen: false,
   });
   parser = this.port.pipe(
@@ -191,14 +191,18 @@ export class SerialService {
       if (this.port.isOpen === true) {
         return true;
       }
-      // console.log('inited');
+      console.log('inited');
       SerialPort.list().then(
         (ports1) => {
-          if (ports1.findIndex((po) => po.path === portname) >= 0) {
+          if (
+            ports1.findIndex(
+              (po) => po.path === process.env.SERIAL_PORT_NAME,
+            ) >= 0
+          ) {
             // this.parser.
             this.port = new SerialPort({
-              path: portname,
-              baudRate: baudRate,
+              path: process.env.SERIAL_PORT_NAME,
+              baudRate: parseInt(process.env.SERIAL_BUADRATE) ?? baudRate,
               autoOpen: true,
             });
             this.parser = this.port
@@ -213,14 +217,15 @@ export class SerialService {
                 this.packetHandler(packet);
               });
 
-            // console.log('parser listener');
-            // console.log(ports1);
+            console.log('parser listener');
+            console.log(ports1);
           } else {
             this.parser.off('data', (packet) => {
               this.packetHandler(packet);
             });
             // this.port.close();
-            // console.log('com port is not connected');
+            console.log('com port is not connected', ports1);
+
             return false;
           }
           // ports1.forEach(console.log);

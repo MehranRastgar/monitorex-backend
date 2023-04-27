@@ -28,9 +28,9 @@ lerna-debug.log*
 *.sublime-workspace
 
 # IDE - VSCode
-.tar
-.zip
-.rar
+*.tar
+*.zip
+*.rar
 .vscode/*
 !.vscode/settings.json
 !.vscode/tasks.json

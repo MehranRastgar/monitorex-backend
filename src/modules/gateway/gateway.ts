@@ -9,7 +9,7 @@ import { Server } from 'socket.io';
 //react app port is important for cors
 @WebSocketGateway(3051, {
   cors: {
-    origin: ['http://localhost:3025', 'http://localhost:3000'],
+    origin: ['*', process.env.FRONT_URL ?? 'http://192.168.1.99:3025'],
   },
 })
 export class MyGateway implements OnModuleInit {

@@ -27,9 +27,11 @@ import { JwtModule, JwtService } from '@nestjs/jwt/dist';
 import { JwtAuthGuard } from './auth/jwt-auth.guard';
 import { DeviceSchema, ebSeries } from './modules/devices/devices.model';
 import { Logger } from '@nestjs/common';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
   imports: [
+    ConfigModule.forRoot(),
     GatewayModule,
     QuizModule,
     // MongooseModule.forRoot('mongodb://localhost:27017', {
@@ -37,10 +39,10 @@ import { Logger } from '@nestjs/common';
     //   retryAttempts: 5000,
     //   retryDelay: 5000,
     // }),root:password
-    MongooseModule.forRoot('mongodb://root:password@localhost:27018', {
-      dbName: 'test',
+    MongooseModule.forRoot(process.env.DB_URL, {
+      dbName: String(process.env.DB_NAME),
       retryAttempts: 5000,
-      retryDelay: 5,
+      retryDelay: 5000,
     }),
     // MongooseModule.forRoot(
     //   'mongodb+srv://root:mehran@cluster0.ie3amiu.mongodb.net/?retryWrites=true&w=majority',
