@@ -62,6 +62,18 @@ export class DevicesService {
     }
   }
   //=============================================================================
+  async deleteDevice(deviceId: string) {
+    try {
+      const id = new mongoose.Types.ObjectId(deviceId);
+
+      const result = await this.deviceModel.findByIdAndDelete(id);
+      return result;
+    } catch (e) {
+      console.log(e);
+      return e;
+    }
+  }
+  //=============================================================================
   async getDeviceSensors(deviceid: any) {
     // sensorModel.find()
     try {

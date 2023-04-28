@@ -38,6 +38,11 @@ export class DevicesController {
     const result = await this.devicesService.putDevice(param.id, deviceData);
     return result;
   }
+  @Delete('/:id')
+  async deviceDelete(@Body() deviceData: Device, @Param() param) {
+    const result = await this.devicesService.deleteDevice(param.id);
+    return result;
+  }
   @Get('/')
   async getDevices(@Query() query) {
     const result = await this.devicesService.getDevices(query);
