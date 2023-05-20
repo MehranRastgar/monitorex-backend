@@ -15,7 +15,7 @@ import {
   sensorseries,
 } from './modules/sensors/sensor/sensor.model';
 import { GatewayModule } from './modules/gateway/gateway.module';
-import { MyGateway } from './modules/gateway/gateway';
+import { MyGateway } from './modules/gateway/gateway.service';
 import { UsersModule } from './users/users.module';
 import { APP_GUARD } from '@nestjs/core';
 import { RolesGuard } from './users/roles.guard';
@@ -28,6 +28,7 @@ import { JwtAuthGuard } from './auth/jwt-auth.guard';
 import { DeviceSchema, ebSeries } from './modules/devices/devices.model';
 import { Logger } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
+import { SerialService } from './modules/serial/serial.service';
 
 @Module({
   imports: [
@@ -85,5 +86,6 @@ import { ConfigModule } from '@nestjs/config';
     UsersService,
     JwtService,
   ],
+  exports: [AppModule],
 })
 export class AppModule {}

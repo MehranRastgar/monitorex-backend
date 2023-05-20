@@ -1,7 +1,7 @@
 import { Injectable, Inject, CACHE_MANAGER } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import mongoose, { Model } from 'mongoose';
-import { MyGateway } from '../gateway/gateway';
+import { MyGateway, MyGatewayInstance } from '../gateway/gateway.service';
 import { Sensor, sensorseries } from '../sensors/sensor/sensor.model';
 import { SensorsService } from '../sensors/sensor/sensors.service';
 import { ParsedDevicesData } from '../serial/serial.service';
@@ -90,7 +90,7 @@ export class DevicesService {
     const cacheKey = `device-${address.Multiport}-${address.SMultiport}`;
     const cachedDevice = await this.cacheManager.get(cacheKey);
     if (cachedDevice) {
-      console.log('device loaded from cache ');
+      // console.log('device loaded from cache ');
       return cachedDevice;
     }
 
@@ -112,7 +112,7 @@ export class DevicesService {
     const cacheKey = `series-${sensor?._id}`;
     const cachedDevice = await this.cacheManager.get(cacheKey);
     if (cachedDevice) {
-      console.log('series loaded from cache ');
+      // console.log('series loaded from cache ');
       return cachedDevice;
     }
 

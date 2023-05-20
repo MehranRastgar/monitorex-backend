@@ -1,12 +1,13 @@
 import { Module, CacheModule } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
-import { MyGateway } from '../gateway/gateway';
 import { GatewayModule } from '../gateway/gateway.module';
 import { SensorSchema, sensorseries } from '../sensors/sensor/sensor.model';
 import { SensorsService } from '../sensors/sensor/sensors.service';
 import { DevicesController } from './devices.controller';
 import { DeviceSchema, ebSeries, TempDevicesSchema } from './devices.model';
 import { DevicesService } from './devices.service';
+import { MyGateway } from '../gateway/gateway.service';
+import { AppModule } from 'src/app.module';
 
 @Module({
   imports: [

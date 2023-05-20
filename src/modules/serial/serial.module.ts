@@ -10,7 +10,8 @@ import {
   TempDevicesSchema,
   ebSeries,
 } from '../devices/devices.model';
-import { MyGateway } from '../gateway/gateway';
+import { MyGateway } from '../gateway/gateway.service';
+// import { MyGateway } from '../gateway/gateway';
 
 @Module({
   imports: [

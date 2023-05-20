@@ -1,13 +1,12 @@
+import { SubscribeMessage } from '@nestjs/websockets';
+import { MyGateway, MyGatewayInstance } from '../gateway/gateway.service';
 import { Injectable, Inject, CACHE_MANAGER } from '@nestjs/common';
-import { PacketLengthParser, ReadlineParser, SerialPort } from 'serialport';
-import { DelimiterParser } from '@serialport/parser-delimiter';
+import { ReadlineParser, SerialPort } from 'serialport';
 import { TransformOptions } from 'stream';
 import { SensorsService } from '../sensors/sensor/sensors.service';
-import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
-import { Sensor, sensorseries } from '../sensors/sensor/sensor.model';
+
 import { DevicesService } from '../devices/devices.service';
-import { MyGateway } from '../gateway/gateway';
+
 import { Cache } from 'cache-manager';
 
 // const portname = '/dev/ttyUSB0' ?? process.env.SERIAL_PORT_NAME;
@@ -35,7 +34,12 @@ export class SerialService {
     @Inject(CACHE_MANAGER) private readonly cacheManager: Cache,
   ) {
     // this.test_basic_connect();
-    setInterval(() => this.test_basic_connect(), 3000);
+
+    setInterval(() => {
+      this.test_basic_connect();
+      this.initialApp();
+    }, 3000);
+
     // let mybuffer: string[] = [];
   }
   port = new SerialPort({
@@ -43,6 +47,7 @@ export class SerialService {
     baudRate: parseInt(process.env.SERIAL_BUADRATE) ?? baudRate,
     autoOpen: false,
   });
+
   parser = this.port.pipe(
     new ReadlineParser({
       delimiter: [250],
@@ -50,6 +55,10 @@ export class SerialService {
       encoding: 'hex',
     }),
   );
+  //===========================================
+  async initialApp() {
+    console.log(this.gateway.inamAzin());
+  }
   //===========================================
   parseSensorPacket(data: string) {
     const faPart = data.substring(0, 2);
@@ -193,7 +202,7 @@ export class SerialService {
       if (this.port.isOpen === true) {
         return true;
       }
-      console.log('inited');
+      // console.log('inited');
       SerialPort.list().then(
         (ports1) => {
           if (
@@ -226,7 +235,7 @@ export class SerialService {
               this.packetHandler(packet);
             });
             // this.port.close();
-            console.log('com port is not connected', ports1);
+            // console.log('com port is not connected', ports1);
 
             return false;
           }
