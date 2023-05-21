@@ -37,7 +37,7 @@ export class SerialService {
 
     setInterval(() => {
       this.test_basic_connect();
-      this.initialApp();
+      // this.initialApp();
     }, 3000);
 
     // let mybuffer: string[] = [];
@@ -57,7 +57,7 @@ export class SerialService {
   );
   //===========================================
   async initialApp() {
-    console.log(this.gateway.inamAzin());
+    // console.log(this.gateway.inamAzin());
   }
   //===========================================
   parseSensorPacket(data: string) {

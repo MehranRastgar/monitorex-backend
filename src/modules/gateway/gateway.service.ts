@@ -55,9 +55,9 @@ export class MyGateway implements OnModuleInit {
     return data;
   }
 
-  inamAzin() {
-    return 'inamAzin';
-  }
+  // inamAzin() {
+  //   return 'inamAzin';
+  // }
 }
 export const MyGatewayInstance = new MyGateway();
 // import * as fs from 'fs';

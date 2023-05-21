@@ -57,9 +57,7 @@ import { SerialService } from './modules/serial/serial.service';
     //     retryDelay: 5,
     //   },
     // ),
-    SensorsModule,
-    DevicesModule,
-    SerialModule,
+
     MongooseModule.forFeature([
       { name: 'Sensor', schema: SensorSchema },
       { name: 'sensorseries', schema: sensorseries },
@@ -75,15 +73,12 @@ import { SerialService } from './modules/serial/serial.service';
   providers: [
     AppService,
     Database,
-    SensorsService,
-    MyGateway,
+
     {
       provide: APP_GUARD,
       useClass: JwtAuthGuard,
     },
     // { provide: APP_GUARD, useClass: RolesGuard },
-    AuthService,
-    UsersService,
     JwtService,
   ],
   exports: [AppModule],
