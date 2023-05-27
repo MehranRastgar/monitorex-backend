@@ -12,12 +12,15 @@ import {
   HttpStatus,
   Response,
   Delete,
+  forwardRef,
+  Inject,
 } from '@nestjs/common';
 import { SerialService } from './serial.service';
 
 @Controller('serial')
 export class SerialController {
-  constructor(private sensorsService: SerialService) {}
+  constructor(
+  ) { }
   // @Get('/')
   // async startAcomPortAndGetData() {
   //   return await this.sensorsService.test_basic_connect();

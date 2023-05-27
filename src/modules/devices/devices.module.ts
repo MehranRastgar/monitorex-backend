@@ -7,7 +7,6 @@ import { DevicesController } from './devices.controller';
 import { DeviceSchema, ebSeries, TempDevicesSchema } from './devices.model';
 import { DevicesService } from './devices.service';
 import { MyGateway } from '../gateway/gateway.service';
-import { AppModule } from 'src/app.module';
 
 @Module({
   imports: [
@@ -26,5 +25,6 @@ import { AppModule } from 'src/app.module';
   ],
   controllers: [DevicesController],
   providers: [DevicesService, SensorsService, MyGateway],
+  exports: [DevicesService]
 })
-export class DevicesModule {}
+export class DevicesModule { }

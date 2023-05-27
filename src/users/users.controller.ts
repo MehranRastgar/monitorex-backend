@@ -30,6 +30,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { AbilityGuard } from './ability.guard';
 import { JwtStrategy } from 'src/auth/jwt.strategy';
 import { CheckAbility } from 'src/ability/ability.factory/ability.decorator';
+import { BypassAuth } from './bypass';
 
 @Controller('users')
 export class UsersController {
@@ -101,6 +102,12 @@ export class UsersController {
   async isLogin(@Headers('authorization') authorization: string): Promise<any> {
     console.log('islogin called', authorization);
     return await this.authService.isLogin(authorization);
+    // return req.user;
+  }
+  @Get('createadmin')
+  async createAdmin(@Headers('key') key: string): Promise<any> {
+    console.log('islogin called', key);
+    return await this.usersService.createAdmin(key)
     // return req.user;
   }
 }

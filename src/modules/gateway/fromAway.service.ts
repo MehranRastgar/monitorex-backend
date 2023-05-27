@@ -141,40 +141,44 @@ import { SensorsService } from '../sensors/sensor/sensors.service';
 import { Inject, OnModuleInit, forwardRef } from '@nestjs/common';
 import { Document, Types } from 'mongoose';
 import { Sensor } from '../sensors/sensor/sensor.model';
-
+import { SerialService } from '../serial/serial.service';
+import { MyGateway } from './gateway.service';
+import { DevicesService } from '../devices/devices.service';
 
 @WebSocketGateway(3051, {
   secure: true,
   cors: {
     origin: '*',
   },
-
+  namespace: 'fromAway'
 })
-export class MyGateway implements OnModuleInit {
+export class FromAway implements OnModuleInit {
 
   @WebSocketServer()
   server: Server;
-  socket: Socket
+  socket: Socket;
   constructor(
-
+    @Inject(forwardRef(() => SerialService))
+    private serial: SerialService,
+    @Inject(forwardRef(() => MyGateway))
+    private gateway: MyGateway,
+    @Inject(forwardRef(() => DevicesService))
+    private devicesService: DevicesService,
   ) {
 
   }
-  async onModuleInit() {
-    // this.server.on('connection', (socket) => {
-    //   console.log(socket.id)
-    //   console.log('connected')
-    // })
-    return true
+  onModuleInit() {
+    this.moduleInitAlternate()
   }
 
 
-  // @SubscribeMessage('identity')
-  // async identity(@MessageBody() data: number): Promise<number> {
+  @SubscribeMessage('fromDevice')
+  fromDevice(@MessageBody() data: any) {
 
-  //   console.log(data)
-  //   return data;
-  // }
+    console.log(data)
+    this.serial.packetHandler(data)
+    return data;
+  }
 
   moduleInitAlternate() {
     this.server.on('connection', (socket) => {
@@ -184,6 +188,7 @@ export class MyGateway implements OnModuleInit {
     this.server.on('events', (socket) => {
       console.log(socket.id)
       console.log('connected')
+
     })
 
   }

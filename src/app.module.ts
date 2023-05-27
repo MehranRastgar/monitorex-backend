@@ -15,7 +15,6 @@ import {
   sensorseries,
 } from './modules/sensors/sensor/sensor.model';
 import { GatewayModule } from './modules/gateway/gateway.module';
-import { MyGateway } from './modules/gateway/gateway.service';
 import { UsersModule } from './users/users.module';
 import { APP_GUARD } from '@nestjs/core';
 import { RolesGuard } from './users/roles.guard';
@@ -29,6 +28,8 @@ import { DeviceSchema, ebSeries } from './modules/devices/devices.model';
 import { Logger } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { SerialService } from './modules/serial/serial.service';
+import { DevicesService } from './modules/devices/devices.service';
+import { MyGateway } from './modules/gateway/gateway.service';
 
 @Module({
   imports: [
@@ -39,6 +40,9 @@ import { SerialService } from './modules/serial/serial.service';
     ConfigModule.forRoot(),
     GatewayModule,
     QuizModule,
+    DevicesModule,
+    SensorsModule,
+    SerialModule,
     // MongooseModule.forRoot('mongodb://localhost:27017', {
     //   dbName: 'monitorex',
     //   retryAttempts: 5000,
@@ -57,7 +61,6 @@ import { SerialService } from './modules/serial/serial.service';
     //     retryDelay: 5,
     //   },
     // ),
-
     MongooseModule.forFeature([
       { name: 'Sensor', schema: SensorSchema },
       { name: 'sensorseries', schema: sensorseries },
@@ -72,15 +75,18 @@ import { SerialService } from './modules/serial/serial.service';
   controllers: [AppController],
   providers: [
     AppService,
+    MyGateway,
     Database,
-
     {
       provide: APP_GUARD,
       useClass: JwtAuthGuard,
     },
-    // { provide: APP_GUARD, useClass: RolesGuard },
     JwtService,
+    UsersService,
+    SensorsService,
   ],
   exports: [AppModule],
 })
-export class AppModule {}
+export class AppModule { }
+// DevicesService,
+// { provide: APP_GUARD, useClass: RolesGuard },

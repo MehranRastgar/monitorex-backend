@@ -1,13 +1,14 @@
 import { SubscribeMessage } from '@nestjs/websockets';
-import { MyGateway, MyGatewayInstance } from '../gateway/gateway.service';
-import { Injectable, Inject, CACHE_MANAGER } from '@nestjs/common';
+import { Injectable, Inject, CACHE_MANAGER, forwardRef } from '@nestjs/common';
 import { ReadlineParser, SerialPort } from 'serialport';
 import { TransformOptions } from 'stream';
-import { SensorsService } from '../sensors/sensor/sensors.service';
 
 import { DevicesService } from '../devices/devices.service';
 
 import { Cache } from 'cache-manager';
+import { ModuleRef } from '@nestjs/core';
+import { Server } from 'socket.io';
+import { MyGateway } from '../gateway/gateway.service';
 
 // const portname = '/dev/ttyUSB0' ?? process.env.SERIAL_PORT_NAME;
 const baudRate = 19200;
@@ -28,18 +29,22 @@ export interface ParsedDevicesData {
 @Injectable()
 export class SerialService {
   constructor(
-    private sensorsService: SensorsService,
-    private devicesService: DevicesService,
+
+    @Inject(forwardRef(() => MyGateway))
     private gateway: MyGateway,
-    @Inject(CACHE_MANAGER) private readonly cacheManager: Cache,
+    @Inject(forwardRef(() => DevicesService))
+    private devicesService: DevicesService,
+    // private server: Server,
+    // @Inject(CACHE_MANAGER) private readonly cacheManager: Cache,
   ) {
     // this.test_basic_connect();
-
+    console.log('services:', 'SerialService')
     setInterval(() => {
       this.test_basic_connect();
       // this.initialApp();
     }, 3000);
 
+    this.initSocket()
     // let mybuffer: string[] = [];
   }
   port = new SerialPort({
@@ -47,6 +52,8 @@ export class SerialService {
     baudRate: parseInt(process.env.SERIAL_BUADRATE) ?? baudRate,
     autoOpen: false,
   });
+
+
 
   parser = this.port.pipe(
     new ReadlineParser({
@@ -56,6 +63,7 @@ export class SerialService {
     }),
   );
   //===========================================
+
   async initialApp() {
     // console.log(this.gateway.inamAzin());
   }
@@ -248,13 +256,21 @@ export class SerialService {
       //   console.log('this.mybuffer:', data);
       // });
 
+
+
+
       return true;
 
       // Pipe the data into another stream (like a parser or standard out)
       // return this.mybuffer;
     } catch (err) {
+
       // console.log(err);
       return true;
     }
+  }
+  async initSocket() {
+    // await this.gateway.onModuleInit()
+    // this.gateway.moduleInitAlternate()
   }
 }

@@ -12,6 +12,8 @@ import {
   HttpStatus,
   Response,
   Delete,
+  forwardRef,
+  Inject,
 } from '@nestjs/common';
 import { ParsedUrlQuery } from 'querystring';
 import { CreateSensorDto } from './dto/CreateSensor.dto';
@@ -19,7 +21,9 @@ import { SensorsService } from './sensors.service';
 
 @Controller('sensors')
 export class SensorsController {
-  constructor(private sensorsService: SensorsService) {}
+  constructor(
+    @Inject(forwardRef(() => SensorsService))
+    private sensorsService: SensorsService) { }
   @Get('/')
   async getAllSensors(@Query() query: ParsedUrlQuery) {
     return await this.sensorsService.getAllSensorsNew(query);

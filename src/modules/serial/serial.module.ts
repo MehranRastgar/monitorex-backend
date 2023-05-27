@@ -30,4 +30,4 @@ import { MyGateway } from '../gateway/gateway.service';
   providers: [SerialService, SensorsService, DevicesService, MyGateway],
   controllers: [SerialController],
 })
-export class SerialModule {}
+export class SerialModule { }

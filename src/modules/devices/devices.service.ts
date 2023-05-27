@@ -1,27 +1,40 @@
-import { Injectable, Inject, CACHE_MANAGER } from '@nestjs/common';
+import { Injectable, Inject, CACHE_MANAGER, forwardRef } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import mongoose, { Model } from 'mongoose';
-import { MyGateway, MyGatewayInstance } from '../gateway/gateway.service';
 import { Sensor, sensorseries } from '../sensors/sensor/sensor.model';
 import { SensorsService } from '../sensors/sensor/sensors.service';
 import { ParsedDevicesData } from '../serial/serial.service';
 import { Device, ebSeries, SensorType, TempDevice } from './devices.model';
 import { Cache } from 'cache-manager';
-
+import { NestFactory } from '@nestjs/core';
+import { AppModule } from 'src/app.module';
+import { MyGateway } from '../gateway/gateway.service';
+// const app =  NestFactory.create(AppModule, {
+//   logger: ['error', 'warn', 'log'],
+// });
 @Injectable()
 export class DevicesService {
   constructor(
-    @InjectModel('Device') private readonly deviceModel: Model<Device>,
-    @InjectModel('ebSeries') private readonly ebModel: Model<ebSeries>,
-    @InjectModel('Sensor') private readonly sensorModel: Model<Sensor>,
+    @InjectModel('Device') public readonly deviceModel: Model<Device>,
+    @InjectModel('ebSeries') public readonly ebModel: Model<ebSeries>,
+    @InjectModel('Sensor') public readonly sensorModel: Model<Sensor>,
     @InjectModel('sensorseries')
-    private readonly sensorseriesModel: Model<sensorseries>,
+    public readonly sensorseriesModel: Model<sensorseries>,
     @InjectModel('TempDevices')
-    private readonly tempDeviceModel: Model<TempDevice>,
-    private sensorsService: SensorsService,
-    private gateway: MyGateway,
-    @Inject(CACHE_MANAGER) private readonly cacheManager: Cache,
-  ) {}
+    public readonly tempDeviceModel: Model<TempDevice>,
+
+    @Inject(forwardRef(() => SensorsService))
+    public sensorsService: SensorsService,
+
+    @Inject(forwardRef(() => MyGateway))
+    public readonly gateway: MyGateway,
+    @Inject(CACHE_MANAGER) public readonly cacheManager: Cache,
+  ) {
+    console.log('services:', 'DevicesService')
+
+
+  }
+
   //=============================================================================
   async insertDevice(DeviceData: Device): Promise<Device | string> {
     const newDevice = new this.deviceModel({ ...DeviceData });
@@ -181,6 +194,7 @@ export class DevicesService {
         if (device?._id === undefined) {
           return;
         }
+
         this.gateway.server.emit(String(device._id), temp);
         this.gateway.server.emit(String(sensor._id), temp);
         if (temp?.value > sensor.maxAlarm) {
@@ -209,7 +223,10 @@ export class DevicesService {
         // });
         let resultCheck = false;
         // console.log(sensorSettings);
-
+        //         const app =await  NestFactory.create(AppModule, {
+        //   logger: ['error', 'warn', 'log'],
+        // });
+        //         const sensorsService = app.get(SensorsService)
         if (date === null) {
           resultCheck = true;
         } else {

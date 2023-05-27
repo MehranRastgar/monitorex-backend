@@ -15,5 +15,6 @@ import { DeviceSchema, ebSeries } from 'src/modules/devices/devices.model';
   ],
   controllers: [SensorsController],
   providers: [SensorsService],
+  exports: [SensorsService]
 })
-export class SensorsModule {}
+export class SensorsModule { }

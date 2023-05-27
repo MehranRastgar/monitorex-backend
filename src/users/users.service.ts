@@ -4,6 +4,8 @@ import mongoose, { Model } from 'mongoose';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UserType } from './user.model';
+import { NestFactory } from '@nestjs/core';
+// import { AppModule } from 'src/app.module';
 export type User = {
   id: string;
   name: string;
@@ -15,7 +17,7 @@ export type User = {
 export class UsersService {
   constructor(
     @InjectModel('User') private readonly userModel: Model<UserType>,
-  ) {}
+  ) { }
   async create(createUserDto: CreateUserDto) {
     const newRecord = new this.userModel(createUserDto);
 
@@ -40,28 +42,28 @@ export class UsersService {
     const userData: UserType = await this.userModel.findById(userId);
     const userDataUpdated = userData.isAdmin
       ? await this.userModel.findByIdAndUpdate(
-          userId,
-          {
-            $set: {
-              ...updateUserDto,
-              password: userData.password,
-              isAdmin: userData.isAdmin,
-            },
+        userId,
+        {
+          $set: {
+            ...updateUserDto,
+            password: userData.password,
+            isAdmin: userData.isAdmin,
           },
-          { new: true },
-        )
+        },
+        { new: true },
+      )
       : await this.userModel.findByIdAndUpdate(
-          userId,
-          {
-            $set: {
-              ...updateUserDto,
-              password: userData.password,
-              isAdmin: userData.isAdmin,
-              accessControll: userData.accessControll,
-            },
+        userId,
+        {
+          $set: {
+            ...updateUserDto,
+            password: userData.password,
+            isAdmin: userData.isAdmin,
+            accessControll: userData.accessControll,
           },
-          { new: true },
-        );
+        },
+        { new: true },
+      );
 
     if (id === String(userDataUpdated._id)) {
       // return userDataUpdated;
@@ -75,8 +77,31 @@ export class UsersService {
 
   async remove(id: string) {
     const userId = new mongoose.Types.ObjectId(id);
-
     return await this.userModel.findByIdAndDelete(userId);
-    return `This action removes a #${id} user`;
+  }
+
+  async createAdmin(key: string) {
+    // const app = await NestFactory.create(AppModule);
+    // const sensorService = app.get(SensorsService);
+    const users: mongoose.Model<UserType>[] = await this.userModel.find();
+
+    if (!users?.length) {
+      const newUser = new this.userModel({
+        accessControll: {
+          devices: 'manage',
+          users: 'manage',
+          profile: 'manage',
+          reports: 'manage'
+        },
+        email: 'admin@monitorex.ir',
+        family: 'admin Family',
+        isAdmin: true,
+        username: 'admin',
+        password: 'admin123'
+      });
+
+      return await newUser.save();
+    }
+    else return 'admin exist'
   }
 }

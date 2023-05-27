@@ -20,7 +20,11 @@ export class SensorsService {
     private readonly sensorseriesModel: Model<sensorseries>,
     @InjectModel('ebSeries')
     private readonly ebModel: Model<ebSeries>,
-  ) {}
+  ) {
+    console.log('services:', 'SensorsService')
+
+
+  }
   //==============================================
   async insertSensor(
     deviceId: string,
@@ -47,12 +51,12 @@ export class SensorsService {
     // const sortType: = query?.sorttype == "desc" ? 1 : -1;
     const textObject: any = query?.q
       ? {
-          $text: {
-            $search: query?.q,
-            $diacriticSensitive: false,
-            $caseSensitive: false,
-          },
-        }
+        $text: {
+          $search: query?.q,
+          $diacriticSensitive: false,
+          $caseSensitive: false,
+        },
+      }
       : {};
     const order: order = query?.order === 'asc' ? 'asc' : 'desc';
     const sort: sort = query?.sort;
@@ -74,12 +78,12 @@ export class SensorsService {
     // const sortType: = query?.sorttype == "desc" ? 1 : -1;
     const textObject: any = query?.q
       ? {
-          $text: {
-            $search: query?.q,
-            $diacriticSensitive: false,
-            $caseSensitive: false,
-          },
-        }
+        $text: {
+          $search: query?.q,
+          $diacriticSensitive: false,
+          $caseSensitive: false,
+        },
+      }
       : {};
     const order: order = query?.order === 'asc' ? 'asc' : 'desc';
     const sort: sort = query?.sort;
@@ -354,7 +358,7 @@ export class SensorsService {
     console.log(
       (Number(toDate.getTime().toPrecision()) -
         Number(fromDate.getTime().toPrecision())) /
-        60000,
+      60000,
     );
     for (let i = minutesCount; i > 0; i--) {
       const GoleDate = new Date(
