@@ -7,14 +7,14 @@ import { UsersService } from './users/users.service';
 @Injectable()
 export class AppService {
   constructor(
-    private readonly userService:UsersService
-  ) {}
+    private readonly userService: UsersService
+  ) { }
 
-  async initialApp():Promise<string>{
+  async initialApp(): Promise<string> {
     await this.userService.createAdmin('sss')
     return 'app initialized'
-  }  
+  }
   getHello(): string {
-    return 'Hello  !';
+    return 'Hello!';
   }
 }

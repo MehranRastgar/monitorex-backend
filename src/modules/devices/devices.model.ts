@@ -49,6 +49,7 @@ export const SensorSchema = new mongoose.Schema(
     unit: { type: String, required: true },
     maxAlarm: { type: Number },
     minAlarm: { type: Number },
+    isRealTime: { type: Boolean, required: false },
     // sensorUniqueName: {
     //   type: String,
     //   required: true,
@@ -118,21 +119,21 @@ export interface TempDevice {
 export interface factors {
   factorName: string;
   factorPosition:
-    | 1
-    | 2
-    | 3
-    | 4
-    | 5
-    | 6
-    | 7
-    | 8
-    | 9
-    | 10
-    | 12
-    | 13
-    | 14
-    | 15
-    | 16;
+  | 1
+  | 2
+  | 3
+  | 4
+  | 5
+  | 6
+  | 7
+  | 8
+  | 9
+  | 10
+  | 12
+  | 13
+  | 14
+  | 15
+  | 16;
   factorValue: number;
 }
 export interface deviceAddress {
@@ -162,6 +163,7 @@ export interface Sensor {
   unit: string;
   maxAlarm: number;
   minAlarm: number;
+  isRealTime?: boolean;
   // sensorUniqueName: string;
   resolution?: 'second' | 'minute' | 'hour';
   sensorRealtimeValues?: SensorRealtimeValues;
