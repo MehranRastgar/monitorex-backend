@@ -175,7 +175,7 @@ export class FromAway implements OnModuleInit {
   @SubscribeMessage('fromDevice')
   fromDevice(@MessageBody() data: any) {
 
-    console.log(data)
+    // console.log(data)
     this.serial.packetHandler(data)
     return data;
   }

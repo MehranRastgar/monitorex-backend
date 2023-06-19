@@ -15,7 +15,7 @@ export class SocketClient implements OnModuleInit {
       console.log('connected to mygateway')
     })
     this.socketClient.on('eve', (data) => {
-      console.log(data)
+      // console.log(data)
     })
   }
 

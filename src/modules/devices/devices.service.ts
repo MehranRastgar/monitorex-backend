@@ -59,6 +59,7 @@ export class DevicesService {
     try {
       const id = new mongoose.Types.ObjectId(deviceId);
       delete body['_id'];
+      // console.count('_id _id_id this.deviceModel.findByIdAndUpdate')
       const result = await this.deviceModel.findByIdAndUpdate(
         id,
         {
@@ -101,12 +102,16 @@ export class DevicesService {
     SMultiport: number;
   }): Promise<any> {
     const cacheKey = `device-${address.Multiport}-${address.SMultiport}`;
+    console.time('gettingCache')
     const cachedDevice = await this.cacheManager.get(cacheKey);
+    console.timeEnd('gettingCache')
+
     if (cachedDevice) {
       // console.log('device loaded from cache ');
       return cachedDevice;
     }
 
+    console.count('device load from db')
     const device = await this.deviceModel
       .findOne({
         'address.multiPort': address.Multiport,
@@ -116,6 +121,7 @@ export class DevicesService {
 
     if (device) {
       await this.cacheManager.set(cacheKey, device, 1000 * 60); // cache for 1 minute
+      // console.count("cache reseted")
     }
 
     return device;
@@ -123,20 +129,28 @@ export class DevicesService {
   //=============================================================================
   async getLastSensorSeriesFromCacheOrDB(sensor: any): Promise<any> {
     const cacheKey = `series-${sensor?._id}`;
-    const cachedDevice = await this.cacheManager.get(cacheKey);
-    if (cachedDevice) {
-      // console.log('series loaded from cache ');
-      return cachedDevice;
+    const cachedDevice: { data: object, isvalid: boolean } = await this.cacheManager.get(cacheKey);
+    if (cachedDevice?.isvalid) {
+      // console.log('series loaded from cache ',);
+      return cachedDevice?.data;
     }
+    if (sensor?._id === null || sensor?._id === undefined) {
+      return null
+    }
+    // console.log(cacheKey)
+    // console.count("sensorseriesModel finded")
 
+    // console.log("sensor id <<<===>>>",)
     const serie = await this.sensorseriesModel
       .findOne({ sensorId: sensor._id })
       .sort({ timestamp: -1 })
-      .exec();
+    // .exec();
 
-    if (serie) {
-      await this.cacheManager.set(cacheKey, serie, 1000 * 45); // cache for 1 minute
-    }
+    // if (serie) {
+    console.log("cache saved")
+    await this.cacheManager.set(cacheKey, { data: serie, isvalid: true }, 1000 * 45); // cache for 1 minute
+    // }
+    // console.log("serie ====>>> ", serie, { sensorId: sensor._id })
 
     return serie;
   }
@@ -213,7 +227,9 @@ export class DevicesService {
             sensorTitle: sensor.title,
           });
         }
+        // console.log("sensor ===>******",)
         const lastRec = await this.getLastSensorSeriesFromCacheOrDB(sensor);
+        // console.log("lastRecorddddd ===>#######",)
         // const lastRec = await this.sensorseriesModel
         //   .findOne({ sensorId: sensor._id })
         //   .sort({ timestamp: -1 });
@@ -270,19 +286,27 @@ export class DevicesService {
       }),
     );
     try {
-      const many = await this.sensorseriesModel.insertMany(makeSensorMany); //makeSensorMany
+      // console.count('makeSensorMany sensorseriesModel.insertMany')
+      // console.log("makeSensorMany=>>>", makeSensorMany)
+      if (makeSensorMany.length > 0) {
+        const many = await this.sensorseriesModel.insertMany(makeSensorMany);
+        return many;
+      } else {
+        return []
+      }
+      //makeSensorMany
+      // console.count('this.deviceModel.findByIdAndUpdate')
+      // const tt = await this.deviceModel.findByIdAndUpdate(
+      //   new mongoose.Types.ObjectId(String(device._id)),
+      //   {
+      //     $set: {
+      //       sensorLastSerie: makeSensorslastSeries,
+      //     },
+      //   },
+      //   { new: true },
+      // );
 
-      const tt = await this.deviceModel.findByIdAndUpdate(
-        new mongoose.Types.ObjectId(String(device._id)),
-        {
-          $set: {
-            sensorLastSerie: makeSensorslastSeries,
-          },
-        },
-        { new: true },
-      );
 
-      return many;
     } catch (e) {
       console.log(e);
     }
@@ -304,7 +328,7 @@ export class DevicesService {
     // );
 
     if (ETX !== 'e6') {
-      console.log('end of packet is damages');
+      // console.count('end of packet is damages');
       return;
     }
     const data = packet.substring(6, packet.length - 2);
@@ -329,6 +353,7 @@ export class DevicesService {
     address: { SMultiport: number; Multiport: number },
     packet: string,
   ) {
+    // console.count('2 device load from db')
     const device = await this.deviceModel.findOne({
       'address.multiPort': address.Multiport,
       'address.sMultiPort': address.SMultiport,

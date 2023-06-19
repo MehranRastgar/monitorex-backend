@@ -14,6 +14,7 @@ export const UserSchema = new mongoose.Schema(
     //   required: true,
     //   unique: true,
     // },
+    chartSettings: { type: Object },
     username: { type: String, required: true, unique: true },
     password: { type: String, required: true },
     name: { type: String },
@@ -81,6 +82,7 @@ export interface UserType {
   };
   email: string;
   isAdmin: isAdminType;
+  chartSettings?:object;
 }
 
 export interface ReportSpec {
