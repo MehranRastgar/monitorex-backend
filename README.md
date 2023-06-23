@@ -151,3 +151,8 @@ const seasonNames = databases.databases
 return seasonNames;
 }
 }
+
+
+
+
+sudo lsof -i :3051

@@ -117,6 +117,19 @@ export class SensorsController {
     );
     return result;
   }
+
+
+  @Post('/v2/report')
+  @HttpCode(200)
+  async getSensorsReportV2(@Body() body) {
+    const result = await this.sensorsService.getSensorsReportV2(
+      body?.sensors,
+      body?.start,
+      body?.end,
+    );
+    return result;
+  }
+
   @Post('/report/eb')
   @HttpCode(200)
   async getEBReport(@Body() body) {

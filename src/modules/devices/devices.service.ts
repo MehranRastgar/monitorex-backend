@@ -377,11 +377,7 @@ export class DevicesService {
     });
 
     if (
-      lastRec?.timestamp < dateRef ||
-      lastRec?.timestamp === undefined ||
-      newSerie.metaField.byte1 !== lastRec.metaField.byte1 ||
-      newSerie.metaField.byte2 !== lastRec.metaField.byte2 ||
-      newSerie.metaField.byte3 !== lastRec.metaField.byte3
+      false
     ) {
       await newSerie.save();
     }

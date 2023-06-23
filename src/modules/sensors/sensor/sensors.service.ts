@@ -476,15 +476,14 @@ export class SensorsService {
     const startDate = new Date(start);
     const endDate = new Date(end);
     const resultArray: any[] = [];
-    console.log(
-      'startDate.toISOString(),',
-      endDate.toISOString(),
-      startDate.toISOString(),
-    );
+
     await Promise.all(
       SensorIds?.map(async (SensorId, index) => {
         const id = new mongoose.Types.ObjectId(SensorId);
         const sens = await this.deviceModel.findOne({ 'sensors._id': id });
+        // const first = await this.sensorseriesModel.findOne({ 'sensorId': id, timestamp: { '$gte': (startDate.toISOString()), '$lte': (endDate.toISOString()), }, },).sort({ timestamp: 1 });
+        // const last = await this.sensorseriesModel.findOne({ 'sensorId': id, timestamp: { '$gte': (startDate.toISOString()), '$lte': (endDate.toISOString()), }, },).sort({ timestamp: -1 });
+
         const result = await this.sensorseriesModel
           .aggregate([
             {
@@ -498,13 +497,12 @@ export class SensorsService {
             },
             {
               $densify: {
-                field: 'timestamp',
+                field: "timestamp",
                 range: {
-                  step: 5,
+                  step: 10,
                   unit: 'minute',
-                  bounds: 'full', //[startDate, endDate],
-                  // bounds: 'full',
-                },
+                  bounds: "full",
+                }
               },
             },
             {
@@ -513,6 +511,9 @@ export class SensorsService {
                 data: {
                   $push: { x: '$timestamp', y: '$metaField.value' },
                 },
+                max: { $max: "$metaField.value" },
+                min: { $min: "$metaField.value" },
+                avg: { $avg: "$metaField.value" }
               },
             },
           ])
@@ -520,16 +521,160 @@ export class SensorsService {
         const ind = sens.sensors.findIndex(
           (item) => String(item._id) === SensorId,
         );
+        const dataLen = result?.[0]?.data?.length
         if (result?.[0]?.data.length > 0) {
           resultArray.push({
             ...result?.[0],
             sensor: sens.sensors[ind],
             device: sens,
+            max: result?.[0]?.max,
+            min: result?.[0]?.min,
+            average: result?.[0]?.avg,
           });
         }
       }),
     );
     return resultArray;
+  }
+  //==============================================
+  async getSensorsReportV2(SensorIds2: string[], start2: string, end2: string) {
+
+    // {"sensors":["63af0a208cddd72ced131b38","63af0a208cddd72ced131b39","63af0a208cddd72ced131b3a","63af0a208cddd72ced131b3b"],"start":"6/7/2023, 1:33:30 PM","end":"2023-06-22T10:03:30.000Z"}
+    const SensorIds = ["63af0a208cddd72ced131b38", "63af0a208cddd72ced131b39", "63af0a208cddd72ced131b3a", "63af0a208cddd72ced131b3b"]
+    const start = "2023-06-07T10:03:30.000Z"
+    const end = "2023-06-22T22:03:30.000Z"
+    const granularity = 5 * 60 * 1000; // 5 minutes in milliseconds
+
+    const startDate = new Date(start);
+    const endDate = new Date(end);
+    const resultArray: any[] = [];
+    console.log(
+      'startDate.toISOString(),',
+      endDate.toISOString(),
+      startDate.toISOString(),
+    );
+
+
+    interface Record extends Document {
+      date: Date;
+      // other fields
+    }
+
+    interface AggregationResult {
+      _id: null;
+      data: {
+        date: Date;
+        count: number;
+      }[];
+    }
+
+    const pipeline: any[] = [
+      // Unwind the sensorLastSerie array to get individual documents
+      {
+        $unwind: '$sensorseries',
+      },
+      // Group documents by timestamp and sensorId to aggregate the data
+      {
+        $group: {
+          _id: {
+            timestamp: {
+              $dateToString: {
+                format: '%Y-%m-%dT%H:%M:%S.%LZ',
+                date: '$sensorseries.timestamp',
+                timezone: 'UTC',
+              },
+            },
+            sensorId: '$sensorseries.sensorId',
+          },
+          values: {
+            $push: '$sensorseries.metaField.value',
+          },
+        },
+      },
+      // Sort the documents by timestamp
+      // {
+      //   $sort: {
+      //     '_id.timestamp': 1,
+      //   },
+      // },
+      // Project the output to the required format
+      {
+        $project: {
+          _id: 0,
+          x: '$_id.timestamp',
+          y: '$values',
+        },
+      },
+    ];
+
+    const result = await this.sensorseriesModel.aggregate(pipeline);
+    // await Promise.all(
+    //   SensorIds?.map(async (SensorId, index) => {
+    //     const id = new mongoose.Types.ObjectId(SensorId);
+    //     const sens = await this.deviceModel.findOne({ 'sensors._id': id });
+    //     const result = await this.sensorseriesModel
+    //       .aggregate([
+    //         {
+    //           $match: {
+    //             sensorId: id,
+    //             timestamp: {
+    //               $gte: new Date(start),
+    //               $lte: new Date(end),
+    //             },
+    //           },
+    //         },
+    //         {
+    //           $densify: {
+
+    //             field: "timestamp",
+    //             range: {
+    //               step: 1,
+    //               unit: 'hour',
+    //               bounds: "full",
+    //             }
+    //           },
+    //         },
+    //         {
+    //           $group: {
+    //             _id: id,
+    //             data: {
+    //               $push: { x: '$timestamp', y: '$metaField.value' },
+    //             },
+    //           },
+    //         },
+    //         // {
+    //         //   $bucket: {
+    //         //     groupBy: "$year_born",                        // Field to group by
+    //         //     boundaries: [1840, 1850, 1860, 1870, 1880], // Boundaries for the buckets
+    //         //     default: "Other",                             // Bucket ID for documents which do not fall into a bucket
+    //         //     output: {                                     // Output for each bucket
+    //         //       "count": { $sum: 1 },
+    //         //       "artists":
+    //         //       {
+    //         //         $push: {
+    //         //           "name": { $concat: ["$first_name", " ", "$last_name"] },
+    //         //           "year_born": "$year_born"
+    //         //         }
+    //         //       }
+    //         //     }
+    //         //   }
+    //         // },
+    //       ])
+    //       .sort({ timestamp: -1 });
+    //     const ind = sens.sensors.findIndex(
+    //       (item) => String(item._id) === SensorId,
+    //     );
+    //     if (result?.[0]?.data.length > 0) {
+    //       resultArray.push({
+    //         // ...result?.[0],
+    //         // sensor: sens.sensors[ind],
+    //         // device: sens,
+    //         length: result?.[0]?.data?.length,
+    //       });
+    //     }
+    //   }),
+    // );
+    return result;
   }
   //==============================================
   async getEBReport(deviceID: string, start: string, end: string) {

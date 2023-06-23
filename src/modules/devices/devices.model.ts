@@ -80,14 +80,14 @@ export const DeviceSchema = new mongoose.Schema(
       validator: true,
     },
     sensors: [SensorSchema],
-    sensorLastSerie: [sensorseries],
-    // {
-    //   sensorId: {
-    //     type: mongoose.Types.ObjectId,
-    //     ref: 'Sensor',
-    //     autopopulate: true,
-    //   },
-    // },
+    sensorLastSerie: //[sensorseries],
+    {
+      sensorId: {
+        type: mongoose.Types.ObjectId,
+        ref: 'Sensor',
+        autopopulate: true,
+      },
+    },
     electricalId: { type: String },
     electricalPort: { type: Number },
     electricals: [ElectricalSchema],
@@ -148,7 +148,7 @@ export interface Device {
   sensors: Sensor[];
   electricals: ElectricalPanelType[];
   numberOfPorts: number;
-  sensorLastSerie?: sensorseries;
+  sensorLastSerie?: mongoose.Schema.Types.ObjectId;
   electricalId?: string;
   electricalPort?: number;
 }
@@ -215,7 +215,7 @@ export const ebSeries = new mongoose.Schema(
 );
 export interface ebSeries {
   // _id: mongoose.Schema.Types.ObjectId;
-  timestamp: mongotimeseries.date;
+  timestamp: mongoose.Schema.Types.Date;
   // target: typeof mongotimeseries;
   sensorId: mongoose.Schema.Types.ObjectId;
   metaField: {

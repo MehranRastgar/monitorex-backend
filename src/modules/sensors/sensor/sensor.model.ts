@@ -10,8 +10,7 @@ export const SensorSchema = new mongoose.Schema(
     },
     sensorLastSerie: {
       type: mongoose.Types.ObjectId,
-      ref: 'sensorseries',
-      autopopulate: true,
+
     },
     title: { type: String, required: true },
     superMultiport: { type: Number, required: true },
@@ -85,7 +84,7 @@ export interface Sensor {
   unit: string;
   sensorUniqueName: string;
   resolution: 'second' | 'minute' | 'hour';
-  sensorLastSerie: sensorseries;
+  sensorLastSerie: mongoose.Schema.Types.ObjectId;//sensorseries;
   sensorRealtimeValues: SensorRealtimeValues;
 }
 export interface SensorRealtimeValues {
