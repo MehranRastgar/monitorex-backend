@@ -33,6 +33,7 @@ export class DevicesService {
     console.log('services:', 'DevicesService')
 
 
+
   }
 
   //=============================================================================
@@ -97,34 +98,55 @@ export class DevicesService {
     }
   }
   //=============================================================================
+  async updateDevicesOnCache() {
+
+    console.log('updateDevicesOnCache')
+
+    const devices = await this.deviceModel
+      .find()
+
+    this.cacheManager.set('devices', devices, 1000 * 60 * 2.5);
+    // devices?.map((device, index) => {
+    //   // console.log(index)
+    //   // console.log(device.address)
+    //   const cacheKey = `devices-${device.id}`;
+    //   this.cacheManager.set(cacheKey, device, 1000 * 60 * 2.5);
+    // })
+  }
+  //=============================================================================
   async getDeviceFromCacheOrDb(address: {
     Multiport: number;
     SMultiport: number;
   }): Promise<any> {
     const cacheKey = `device-${address.Multiport}-${address.SMultiport}`;
-    console.time('gettingCache')
-    const cachedDevice = await this.cacheManager.get(cacheKey);
-    console.timeEnd('gettingCache')
 
-    if (cachedDevice) {
-      // console.log('device loaded from cache ');
-      return cachedDevice;
-    }
+    return await this.cacheManager.get(cacheKey);
 
-    console.count('device load from db')
-    const device = await this.deviceModel
-      .findOne({
-        'address.multiPort': address.Multiport,
-        'address.sMultiPort': address.SMultiport,
-      })
-      .exec();
 
-    if (device) {
-      await this.cacheManager.set(cacheKey, device, 1000 * 60); // cache for 1 minute
-      // console.count("cache reseted")
-    }
+    // const cacheKey = `device-${address.Multiport}-${address.SMultiport}`;
+    // console.time('gettingCache')
+    // const cachedDevice = await this.cacheManager.get(cacheKey);
+    // console.timeEnd('gettingCache')
 
-    return device;
+    // if (cachedDevice) {
+    //   // console.log('device loaded from cache ');
+    //   return cachedDevice;
+    // }
+
+    // console.count('device load from db')
+    // const device = await this.deviceModel
+    //   .findOne({
+    //     'address.multiPort': address.Multiport,
+    //     'address.sMultiPort': address.SMultiport,
+    //   })
+    //   .exec();
+
+    // if (device) {
+    //   await this.cacheManager.set(cacheKey, device, 1000 * 60); // cache for 1 minute
+    //   // console.count("cache reseted")
+    // }
+
+    // return device;
   }
   //=============================================================================
   async getLastSensorSeriesFromCacheOrDB(sensor: any): Promise<any> {
@@ -154,6 +176,83 @@ export class DevicesService {
 
     return serie;
   }
+  //=============================================================================
+  async addRecordToCache(
+    address: { SMultiport: number; Multiport: number },
+    parsedPacket: ParsedDevicesData,
+  ) {
+    if (parsedPacket.statuse === 240) {
+      // console.log('is device');
+    } else return;
+
+    if (parsedPacket.end === 230) {
+      // console.log('end is true');
+    } else return;
+    const devices: Device[] = await this.cacheManager.get('devices')
+    const device = devices?.find((dev) => (dev?.address?.multiPort !== undefined && dev?.address?.sMultiPort !== undefined) && (dev.address.multiPort === address.Multiport && dev.address.sMultiPort === address?.SMultiport))
+    const cacheKey = String(device?._id);
+    await this.cacheManager.set(cacheKey, parsedPacket, 1000 * 60);
+    // this.gateway.server.emit('device', parsedPacket);
+    device?.sensors?.map((sensor, index) => {
+      const value = parsedPacket?.sensors?.[index]
+      const temp = {
+        deviceId: String(device?._id),
+        sensorId: String(sensor?._id),
+        sensorTitle: sensor?.title,
+        deviceTitle: device?.title,
+        value: value,
+        max: sensor?.maxAlarm,
+        min: sensor?.minAlarm,
+      }
+      // device?.sensors?.[index]._id
+      this.gateway.server.emit(String(sensor._id), temp);
+
+      // console.log(temp)
+    })
+    // this.gateway.server.emit(String(sensor._id), temp);
+
+    // this.gateway.server.emit(`device-${device?._id}`,
+    //   {
+
+    //   }
+    // );
+    // const cacheKey = `device-${device.address?.sMultiPort}-${device.address?.multiPort}`;
+    // this.cacheManager.set(cacheKey, device, 1000 * 60 * 2.5);
+    // console.log(parsedPacket)
+
+  }
+  //=============================================================================
+  async saveAllSensorsDataWithInterval() {
+    const devices: Device[] = await this.cacheManager.get('devices')
+    let arrayOfTimeSerieseToSave: any = []
+    if (devices === undefined) return
+    await Promise.all(
+      devices?.map(async (device, indexDev) => {
+        const deviceCachedValues: any = await this.cacheManager.get(String(device?._id));
+        const date = new Date();
+        // console.log(deviceCachedValues)
+
+        device?.sensors?.map((sensor, index) => {
+          const newRecord = new this.sensorseriesModel({
+            timestamp: this.sensorsService.setToSecondZero(date),
+            sensorId: sensor._id,
+            metaField: {
+              value: deviceCachedValues?.sensors?.[index] ?? null,
+            },
+          });
+          arrayOfTimeSerieseToSave.push(newRecord)
+        })
+
+      }))
+    if (arrayOfTimeSerieseToSave?.length > 0) {
+      const arraySaved = await this.sensorseriesModel.insertMany(arrayOfTimeSerieseToSave);
+      // console.log(arrayOfTimeSerieseToSave)
+
+    }
+    // const device = devices?.find((dev) => (dev?.address?.multiPort !== undefined && dev?.address?.sMultiPort !== undefined) && (dev.address.multiPort === address.Multiport && dev.address.sMultiPort === address?.SMultiport))
+    // const cacheKey = String(device._id);
+  }
+  //=============================================================================
   //=============================================================================
   async addRecordSeriesWithDevice(
     address: { SMultiport: number; Multiport: number },
@@ -209,8 +308,8 @@ export class DevicesService {
           return;
         }
 
-        this.gateway.server.emit(String(device._id), temp);
-        this.gateway.server.emit(String(sensor._id), temp);
+        this.gateway.server.emit(String(device?._id), temp);
+        this.gateway.server.emit(String(sensor?._id), temp);
         if (temp?.value > sensor.maxAlarm) {
           this.gateway.server.emit('alarms', {
             message: 'maximum Range',
@@ -384,7 +483,7 @@ export class DevicesService {
     if (device?._id === undefined) {
       return;
     }
-    this.gateway.server.emit(String(device._id), newSerie);
+    this.gateway.server.emit(String(device?._id), newSerie);
     // console.log(str, dev);
   }
 }

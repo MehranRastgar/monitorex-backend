@@ -141,6 +141,7 @@ export interface deviceAddress {
   sMultiPort: number;
 }
 export interface Device {
+  _id?: mongoose.Schema.Types.ObjectId;
   title: string;
   address: deviceAddress;
   type: 'Electrical panel' | 'Sensor Cotroller';

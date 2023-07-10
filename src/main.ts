@@ -4,6 +4,7 @@ import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { AppService } from './app.service';
 import { UsersService } from './users/users.service';
 import { MyGateway } from './modules/gateway/gateway.service';
+import { DevicesService } from './modules/devices/devices.service';
 // import { MyGateway } from './modules/gateway/gateway.service';
 
 async function bootstrap() {
@@ -26,12 +27,22 @@ async function bootstrap() {
   await app.listen(process.env.PORT);
 
   const userService = app.get(UsersService)
+  const devicesService = app.get(DevicesService)
   const init = await userService.createAdmin('s')
   console.log(init)
   const wsgateway = app.get(MyGateway)
   wsgateway.moduleInitAlternate()
 
+  devicesService.updateDevicesOnCache();
 
+  setInterval(() => {
+    devicesService.updateDevicesOnCache();
+  }, 125000); // 2 minutes in milliseconds
 
+  devicesService.saveAllSensorsDataWithInterval();
+
+  setInterval(() => {
+    devicesService.saveAllSensorsDataWithInterval();
+  }, 60000);
 }
 bootstrap();

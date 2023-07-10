@@ -21,12 +21,14 @@ import mongoose, { Model } from 'mongoose';
 
 @Controller('devices')
 export class DevicesController {
-  constructor(private devicesService: DevicesService) {}
+  constructor(private devicesService: DevicesService) { }
 
   @Post('/')
   @HttpCode(201)
   async deviceCreate(@Body() deviceData) {
     const result = await this.devicesService.insertDevice(deviceData);
+    this.devicesService.updateDevicesOnCache();
+
     if (typeof result === 'string') {
       throw new BadRequestException(result);
     } else {
@@ -36,11 +38,15 @@ export class DevicesController {
   @Put('/:id')
   async deviceUpdate(@Body() deviceData: Device, @Param() param) {
     const result = await this.devicesService.putDevice(param.id, deviceData);
+    this.devicesService.updateDevicesOnCache();
+
     return result;
   }
   @Delete('/:id')
   async deviceDelete(@Body() deviceData: Device, @Param() param) {
     const result = await this.devicesService.deleteDevice(param.id);
+    this.devicesService.updateDevicesOnCache();
+
     return result;
   }
   @Get('/')

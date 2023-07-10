@@ -39,6 +39,7 @@ export class SerialService {
   ) {
     // this.test_basic_connect();
     console.log('services:', 'SerialService')
+
     setInterval(() => {
       this.test_basic_connect();
       // this.initialApp();
@@ -179,7 +180,7 @@ export class SerialService {
   }
   //===========================================
   packetHandler(packet: string) {
-    this.gateway.server.emit('terminal', packet);
+    // this.gateway.server.emit('terminal', packet);
 
     if (packet.substring(0, 2) === 'f0') {
       const parsedPacket: ParsedDevicesData = this.parseSensorPacket(packet);
@@ -187,7 +188,8 @@ export class SerialService {
         SMultiport: parsedPacket.addrSMultiPort,
         Multiport: parsedPacket.addrMultiPort,
       };
-      this.devicesService.addRecordSeriesWithDevice(address, parsedPacket);
+      // this.devicesService.addRecordSeriesWithDevice(address, parsedPacket);
+      this.devicesService.addRecordToCache(address, parsedPacket);
       return;
     }
     if (packet.substring(0, 2) === 'eb') {
@@ -196,6 +198,7 @@ export class SerialService {
         SMultiport: parsedPacket.addrSMultiPort,
         Multiport: parsedPacket.addrMultiPort,
       };
+      // console.log(parsedPacket)
       this.devicesService.addElectricalBoardSerries(address, packet);
       // console.log('is electrical');
     }
