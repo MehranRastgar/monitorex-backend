@@ -240,6 +240,15 @@ export class DevicesService {
               value: deviceCachedValues?.sensors?.[index] ?? null,
             },
           });
+          const recforsend = newRecord.toJSON()
+
+          this.gateway.server.emit(String(recforsend.sensorId), {
+            deviceId: device?._id,
+            createdAt: new Date(),
+            sensorId: recforsend.sensorId,
+            value: recforsend.metaField.value,
+            saved: true
+          });
           arrayOfTimeSerieseToSave.push(newRecord)
         })
 
@@ -247,7 +256,6 @@ export class DevicesService {
     if (arrayOfTimeSerieseToSave?.length > 0) {
       const arraySaved = await this.sensorseriesModel.insertMany(arrayOfTimeSerieseToSave);
       // console.log(arrayOfTimeSerieseToSave)
-
     }
     // const device = devices?.find((dev) => (dev?.address?.multiPort !== undefined && dev?.address?.sMultiPort !== undefined) && (dev.address.multiPort === address.Multiport && dev.address.sMultiPort === address?.SMultiport))
     // const cacheKey = String(device._id);
