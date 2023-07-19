@@ -464,20 +464,37 @@ export class DevicesService {
     packet: string,
   ) {
     // console.count('2 device load from db')
-    const device = await this.deviceModel.findOne({
-      'address.multiPort': address.Multiport,
-      'address.sMultiPort': address.SMultiport,
-    });
-    const dev = device?.toJSON();
+    // const device = await this.deviceModel.findOne({
+    //   'address.multiPort': address.Multiport,
+    //   'address.sMultiPort': address.SMultiport,
+    // });
+    // const dev = await this.getDeviceFromCacheOrDb(address);
+
+
+
     const str: elecChannels = await this.ParseElectricalPacket(packet);
+    const devices: Device[] = await this.cacheManager.get('devices')
+    const dev = devices?.find((dev) => (dev?.address?.multiPort !== undefined && dev?.address?.sMultiPort !== undefined) && (dev.address.multiPort === address.Multiport && dev.address.sMultiPort === address?.SMultiport))
+    const cacheKey = String(dev?._id);
+    if (cacheKey === 'undefined') return;
+    const lastDataOfEB = await this.cacheManager.get(cacheKey);
+    await this.cacheManager.set(cacheKey, str, 1000 * 60);
+
+
+
+
+
+    // const dev = device?.toJSON();
+    // console.log(dev?.title, str)
     const dateRef = new Date();
     dateRef.setMilliseconds(0);
     dateRef.setSeconds(0);
-    const lastRec = await this.ebModel
-      .findOne({ deviceId: device?._id })
-      .sort({ timestamp: -1 });
+    // const readLastData = this.LastElectricalData(dev?._id)
+    // const lastRec = await this.ebModel
+    //   .findOne({ deviceId: dev?._id })
+    //   .sort({ timestamp: -1 });
     const newSerie = new this.ebModel({
-      deviceId: device?._id,
+      deviceId: dev?._id,
       timestamp: dateRef,
       metaField: {
         byte1: str.Ch1_7,
@@ -485,16 +502,18 @@ export class DevicesService {
         byte3: str.Ch15_21,
       },
     });
+    if (JSON.stringify(lastDataOfEB) !== JSON.stringify(str)) {
 
-    if (
-      false
-    ) {
+      console.log("save to eb series", lastDataOfEB, str)
+
       await newSerie.save();
+    } else {
+      console.log('no change in eb')
     }
-    if (device?._id === undefined) {
+    if (dev?._id === undefined) {
       return;
     }
-    this.gateway.server.emit(String(device?._id), newSerie);
+    this.gateway.server.emit(String(dev?._id), newSerie);
     // console.log(str, dev);
   }
 }
