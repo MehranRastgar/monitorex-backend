@@ -530,11 +530,17 @@ export class SensorsService {
             max: result?.[0]?.max,
             min: result?.[0]?.min,
             average: result?.[0]?.avg,
+            number: index
           });
         }
       }),
     );
-    return resultArray;
+    //sort
+    const sortedArr: any[] = []
+    resultArray.map((arr, index) => {
+      sortedArr.push(resultArray.find(item => item.number === index))
+    })
+    return sortedArr;
   }
   //==============================================
   async getSensorsReportV2(SensorIds2: string[], start2: string, end2: string) {

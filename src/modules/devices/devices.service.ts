@@ -205,7 +205,10 @@ export class DevicesService {
         min: sensor?.minAlarm,
       }
       // device?.sensors?.[index]._id
-      this.gateway.server.emit(String(sensor._id), temp);
+      this.gateway.server.emit(String(sensor._id), {
+        ...temp,
+        createdAt: new Date(),
+      });
 
       // console.log(temp)
     })
