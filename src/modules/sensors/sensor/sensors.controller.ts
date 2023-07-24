@@ -14,10 +14,14 @@ import {
   Delete,
   forwardRef,
   Inject,
+  UseGuards,
 } from '@nestjs/common';
 import { ParsedUrlQuery } from 'querystring';
 import { CreateSensorDto } from './dto/CreateSensor.dto';
 import { SensorsService } from './sensors.service';
+import { CheckAbility } from 'src/ability/ability.factory/ability.decorator';
+import { AbilityGuard } from 'src/users/ability.guard';
+import { AbilityAction } from 'src/users/user.model';
 
 @Controller('sensors')
 export class SensorsController {
@@ -108,6 +112,8 @@ export class SensorsController {
     return result;
   }
   @Post('/report')
+  @UseGuards(AbilityGuard)
+  @CheckAbility({ action: AbilityAction.Read, subject: 'reports' })
   @HttpCode(200)
   async getSensorsReport(@Body() body) {
     const result = await this.sensorsService.getSensorsReport(
@@ -131,10 +137,12 @@ export class SensorsController {
   }
 
   @Post('/report/eb')
+  @UseGuards(AbilityGuard)
+  @CheckAbility({ action: AbilityAction.Read, subject: 'reports' })
   @HttpCode(200)
   async getEBReport(@Body() body) {
     const result = await this.sensorsService.getEBReport(
-      body?.device,
+      body?.deviceId,
       body?.start,
       body?.end,
     );

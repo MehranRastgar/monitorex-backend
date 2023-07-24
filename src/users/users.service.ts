@@ -34,7 +34,35 @@ export class UsersService {
     return await this.userModel.findById(userId);
     // return `This action returns a #${id} user`;
   }
+  async updateOwn(id: string, updateUserDto: UpdateUserDto) {
+    // console.log(id);
+    console.log(updateUserDto);
 
+    const userId = new mongoose.Types.ObjectId(id);
+    const userData: UserType = await this.userModel.findById(userId);
+    const userDataUpdated = await this.userModel.findByIdAndUpdate(
+      userId,
+      {
+        $set: {
+          ...updateUserDto,
+          password: userData.password,
+          isAdmin: userData.isAdmin,
+          // accessControll: userData.accessControll,
+
+        },
+      },
+      { new: true },
+    )
+
+    if (id === String(userDataUpdated._id)) {
+      // return userDataUpdated;
+      return {
+        user: { ...userDataUpdated.toJSON() },
+      };
+    } else {
+      return `This action updates a #${id} user`;
+    }
+  }
   async update(id: string, updateUserDto: UpdateUserDto) {
     // console.log(id);
     // console.log(updateUserDto);
@@ -48,6 +76,8 @@ export class UsersService {
             ...updateUserDto,
             password: userData.password,
             isAdmin: userData.isAdmin,
+            // accessControll: userData.accessControll,
+
           },
         },
         { new: true },
@@ -59,7 +89,7 @@ export class UsersService {
             ...updateUserDto,
             password: userData.password,
             isAdmin: userData.isAdmin,
-            accessControll: userData.accessControll,
+            // accessControll: userData.accessControll,
           },
         },
         { new: true },

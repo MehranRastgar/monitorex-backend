@@ -25,22 +25,22 @@ export const UserSchema = new mongoose.Schema(
       devices: {
         type: String,
         default: 'read',
-        enum: ['manage', 'create', 'read', 'update', 'delete'],
+        enum: ['manage', 'read', 'none'],
       },
       users: {
         type: String,
         default: 'read',
-        enum: ['manage', 'create', 'read', 'update', 'delete'],
+        enum: ['manage', 'read', 'none'],
       },
       profile: {
         type: String,
         default: 'read',
-        enum: ['manage', 'create', 'read', 'update', 'delete'],
+        enum: ['manage', 'read', 'none'],
       },
       reports: {
         type: String,
         default: 'read',
-        enum: ['manage', 'create', 'read', 'update', 'delete'],
+        enum: ['manage', 'read', 'none'],
       },
     },
     groups: [
@@ -82,7 +82,7 @@ export interface UserType {
   };
   email: string;
   isAdmin: isAdminType;
-  chartSettings?:object;
+  chartSettings?: object;
 }
 
 export interface ReportSpec {
@@ -95,15 +95,17 @@ export type isAdminType = boolean;
 export type abilityActionsType =
   | 'admin'
   | 'manage'
-  | 'create'
+  // | 'create'
   | 'read'
-  | 'update'
-  | 'delete';
+  | 'none'
+// | 'update'
+// | 'delete';
 export enum AbilityAction {
   Admin = 'admin',
   Manage = 'manage',
-  Create = 'create',
+  // Create = 'create',
   Read = 'read',
-  Update = 'update',
-  Delete = 'delete',
+  None = 'none'
+  // Update = 'update',
+  // Delete = 'delete',
 }

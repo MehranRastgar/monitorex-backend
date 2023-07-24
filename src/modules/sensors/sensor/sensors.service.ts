@@ -537,8 +537,9 @@ export class SensorsService {
     );
     //sort
     const sortedArr: any[] = []
-    resultArray.map((arr, index) => {
-      sortedArr.push(resultArray.find(item => item.number === index))
+    SensorIds.map((arr, index) => {
+      // console.log(arr)
+      sortedArr.push(resultArray.find(item => String(item._id) === arr))
     })
     return sortedArr;
   }
@@ -685,7 +686,8 @@ export class SensorsService {
   //==============================================
   async getEBReport(deviceID: string, start: string, end: string) {
     const id = new mongoose.Types.ObjectId(deviceID);
-    // const sens = await this.deviceModel.findOne({ 'sensors._id': id });
+    // const result = await this.ebModel.findOne({ 'deviceId': id });
+    // console.log(result)
     const result = await this.ebModel
       .aggregate([
         {
@@ -712,7 +714,7 @@ export class SensorsService {
           $group: {
             _id: id,
             data: {
-              $push: { x: '$timestamp', y: '$metaField.value' },
+              $push: { x: '$timestamp', y: '$metaField' },
             },
           },
         },

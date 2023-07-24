@@ -9,7 +9,7 @@ export interface RequiredRule {
 export const CHECK_ABILITY = 'check_ability';
 export const CheckAbility = (...requirements: RequiredRule[]) =>
   SetMetadata(CHECK_ABILITY, requirements);
-export class ReadUserAbility implements RequiredRule {
-  action = AbilityAction.Read;
-  subject = User;
-} //expample to find away to more reusable components
+// export class ReadUserAbility implements RequiredRule {
+//   action = AbilityAction.Read;
+//   subject = undefined;
+// } //expample to find away to more reusable components

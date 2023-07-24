@@ -469,7 +469,7 @@ export class DevicesService {
     //   'address.sMultiPort': address.SMultiport,
     // });
     // const dev = await this.getDeviceFromCacheOrDb(address);
-
+    // console.log(address)
 
 
     const str: elecChannels = await this.ParseElectricalPacket(packet);
@@ -483,12 +483,14 @@ export class DevicesService {
 
 
 
-
+    if (str === undefined || lastDataOfEB === undefined) {
+      return
+    }
     // const dev = device?.toJSON();
     // console.log(dev?.title, str)
     const dateRef = new Date();
     dateRef.setMilliseconds(0);
-    dateRef.setSeconds(0);
+    // dateRef.setSeconds(0);
     // const readLastData = this.LastElectricalData(dev?._id)
     // const lastRec = await this.ebModel
     //   .findOne({ deviceId: dev?._id })

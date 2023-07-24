@@ -10,7 +10,7 @@ export class AuthService {
     private usersService: UsersService,
     private jwtService: JwtService,
     @InjectModel('User') private userSchema: Model<UserType>,
-  ) {}
+  ) { }
   async validateUser(username: string, password: string): Promise<any> {
     const user: UserType = await this.userSchema.findOne({
       username: username,
@@ -34,7 +34,7 @@ export class AuthService {
     // console.log('login', user._doc);
     const token = this.jwtService.sign(payload);
     const userObj = this.jwtService.decode(token);
-    console.log('what is here', userObj?.sub);
+    // console.log('what is here', userObj?.sub);
     const userdata = await this.usersService.findOne(userObj?.sub);
     userdata.password = '*******';
     // const userdatawithoutpass: UserType = {

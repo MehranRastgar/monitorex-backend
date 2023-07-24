@@ -39,14 +39,14 @@ export class UsersController {
     private readonly authService: AuthService,
     private readonly abilityFactory: AbilityFactory,
     @InjectModel('User') private readonly userModel: Model<UserType>,
-  ) {}
+  ) { }
 
   // @SetMetadata('roles', [Role.ADMIN])
   // @Roles(Role.ADMIN)
   @Post()
   // @UseGuards(JwtAuthGuard)
   @UseGuards(AbilityGuard)
-  @CheckAbility({ action: AbilityAction.Manage, subject: User })
+  @CheckAbility({ action: AbilityAction.Manage, subject: 'user' })
   async create(@Body() createUserDto: CreateUserDto) {
     // const ability = this.abilityFactory.defineAbility()
     // password: CryptoJS.AES.encrypt(
@@ -61,7 +61,7 @@ export class UsersController {
 
   @Get()
   @UseGuards(AbilityGuard)
-  @CheckAbility({ action: AbilityAction.Read, subject: User })
+  @CheckAbility({ action: AbilityAction.Read, subject: 'user' })
   async findAll() {
     // const user: UserType = await this.userModel.findById('');
     // const ability = this.abilityFactory.defineAbility(user);
@@ -72,21 +72,29 @@ export class UsersController {
 
   @Get(':id')
   @UseGuards(AbilityGuard)
-  @CheckAbility({ action: AbilityAction.Read, subject: User })
+  @CheckAbility({ action: AbilityAction.Read, subject: 'user' })
   async findOne(@Param('id') id: string) {
     return await this.usersService.findOne(id);
   }
 
   @Patch(':id')
   @UseGuards(AbilityGuard)
-  @CheckAbility({ action: AbilityAction.Update, subject: User })
+  @CheckAbility({ action: AbilityAction.Manage, subject: 'user' })
   async update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
     return await this.usersService.update(id, updateUserDto);
   }
 
+
+  @Patch('own/:id')
+  @UseGuards(AbilityGuard)
+  @CheckAbility({ action: AbilityAction.Manage, subject: 'profile' })
+  async updateOwn(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
+    return await this.usersService.updateOwn(id, updateUserDto);
+  }
+
   @Delete(':id')
   @UseGuards(AbilityGuard)
-  @CheckAbility({ action: AbilityAction.Admin, subject: User })
+  @CheckAbility({ action: AbilityAction.Admin, subject: 'user' })
   async remove(@Param('id') id: string) {
     return await this.usersService.remove(id);
   }

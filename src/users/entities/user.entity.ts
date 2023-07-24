@@ -32,15 +32,19 @@ export class UserCl {
 
 export type isAdminType = boolean;
 export type abilityActionsType =
+  | 'admin'
   | 'manage'
-  | 'create'
+  // | 'create'
   | 'read'
-  | 'update'
-  | 'delete';
+  | 'none'
+// | 'update'
+// | 'delete';
 export enum AbilityAction {
+  Admin = 'admin',
   Manage = 'manage',
-  Create = 'create',
+  // Create = 'create',
   Read = 'read',
-  Update = 'update',
-  Delete = 'delete',
+  None = 'none'
+  // Update = 'update',
+  // Delete = 'delete',
 }
