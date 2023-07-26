@@ -44,5 +44,8 @@ async function bootstrap() {
   setInterval(() => {
     devicesService.saveAllSensorsDataWithInterval();
   }, 60000);
+  setInterval(() => {
+    devicesService.saveAllEbDataWithInterval();
+  }, 60000);
 }
 bootstrap();

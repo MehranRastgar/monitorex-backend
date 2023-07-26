@@ -181,9 +181,10 @@ export class SerialService {
   //===========================================
   packetHandler(packet: string) {
     // this.gateway.server.emit('terminal', packet);
+    // console.log(packet)
 
+    const parsedPacket: ParsedDevicesData = this.parseSensorPacket(packet);
     if (packet.substring(0, 2) === 'f0') {
-      const parsedPacket: ParsedDevicesData = this.parseSensorPacket(packet);
       const address = {
         SMultiport: parsedPacket.addrSMultiPort,
         Multiport: parsedPacket.addrMultiPort,
@@ -193,7 +194,7 @@ export class SerialService {
       return;
     }
     if (packet.substring(0, 2) === 'eb') {
-      const parsedPacket: ParsedDevicesData = this.parseSensorPacket(packet);
+      // const parsedPacket: ParsedDevicesData = this.parseSensorPacket(packet);
       const address = {
         SMultiport: parsedPacket.addrSMultiPort,
         Multiport: parsedPacket.addrMultiPort,
@@ -204,6 +205,7 @@ export class SerialService {
     }
     if (packet.substring(0, 2) === 'f5') {
       //ghat handler
+      console.log(parsedPacket.addrSMultiPort)
     }
   }
   //===========================================

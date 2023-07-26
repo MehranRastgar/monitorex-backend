@@ -169,7 +169,7 @@ export class DevicesService {
     // .exec();
 
     // if (serie) {
-    console.log("cache saved")
+    // console.log("cache saved")
     await this.cacheManager.set(cacheKey, { data: serie, isvalid: true }, 1000 * 45); // cache for 1 minute
     // }
     // console.log("serie ====>>> ", serie, { sensorId: sensor._id })
@@ -264,6 +264,75 @@ export class DevicesService {
     // const cacheKey = String(device._id);
   }
   //=============================================================================
+  async saveAllEbDataWithInterval() {
+    const devices: Device[] = await this.cacheManager.get('devices')
+    let arrayOfTimeSerieseToSave: any = [
+
+    ]
+    if (devices === undefined) return
+    await Promise.all(
+      devices?.map(async (device, indexDev) => {
+        if (device.type === 'Electrical panel') {
+          // console.log(device.title)
+          const cacheKey = String(device?._id);
+          let lastDataOfEB = await this.cacheManager.get(cacheKey);
+          if (lastDataOfEB === undefined) {
+            lastDataOfEB = {
+              Ch1_7: null, Ch8_14: null, Ch15_21: null
+            }
+            const dateRef = new Date();
+            dateRef.setMilliseconds(0);
+            const newSerie = new this.ebModel({
+              deviceId: device?._id,
+              timestamp: new Date(),
+              metaField: {
+                byte1: null,
+                byte2: null,
+                byte3: null,
+              },
+            });
+            arrayOfTimeSerieseToSave.push({ ...newSerie })
+            newSerie.save()
+          }
+          // console.log(lastDataOfEB)
+
+        }
+        // const deviceCachedValues: any = await this.cacheManager.get(String(device?._id));
+        // const date = new Date();
+        // console.log(deviceCachedValues)
+
+        // device?.sensors?.map((sensor, index) => {
+        //   const newRecord = new this.sensorseriesModel({
+        //     timestamp: this.sensorsService.setToSecondZero(date),
+        //     sensorId: sensor._id,
+        //     metaField: {
+        //       value: deviceCachedValues?.sensors?.[index] ?? null,
+        //     },
+        //   });
+        //   const recforsend = newRecord.toJSON()
+
+        //   this.gateway.server.emit(String(recforsend.sensorId), {
+        //     deviceId: device?._id,
+        //     createdAt: new Date(),
+        //     sensorId: recforsend.sensorId,
+        //     value: recforsend.metaField.value,
+        //     saved: true
+        //   });
+        //   arrayOfTimeSerieseToSave.push(newRecord)
+        // })
+
+      }))
+    if (arrayOfTimeSerieseToSave.length) { }
+    // this.ebModel.insertMany(arrayOfTimeSerieseToSave)
+
+
+    // if (arrayOfTimeSerieseToSave?.length > 0) {
+    //   const arraySaved = await this.sensorseriesModel.insertMany(arrayOfTimeSerieseToSave);
+    //   // console.log(arrayOfTimeSerieseToSave)
+    // }
+    // const device = devices?.find((dev) => (dev?.address?.multiPort !== undefined && dev?.address?.sMultiPort !== undefined) && (dev.address.multiPort === address.Multiport && dev.address.sMultiPort === address?.SMultiport))
+    // const cacheKey = String(device._id);
+  }
   //=============================================================================
   async addRecordSeriesWithDevice(
     address: { SMultiport: number; Multiport: number },
@@ -506,11 +575,11 @@ export class DevicesService {
     });
     if (JSON.stringify(lastDataOfEB) !== JSON.stringify(str)) {
 
-      console.log("save to eb series", lastDataOfEB, str)
+      // console.log("save to eb series", lastDataOfEB, str)
 
       await newSerie.save();
     } else {
-      console.log('no change in eb')
+      // console.log('no change in eb')
     }
     if (dev?._id === undefined) {
       return;
