@@ -275,7 +275,7 @@ export class DevicesService {
         if (device.type === 'Electrical panel') {
           // console.log(device.title)
           const cacheKey = String(device?._id);
-          let lastDataOfEB = await this.cacheManager.get(cacheKey);
+          let lastDataOfEB: any = await this.cacheManager.get(cacheKey);
           if (lastDataOfEB === undefined) {
             lastDataOfEB = {
               Ch1_7: null, Ch8_14: null, Ch15_21: null
@@ -289,6 +289,21 @@ export class DevicesService {
                 byte1: null,
                 byte2: null,
                 byte3: null,
+              },
+            });
+            arrayOfTimeSerieseToSave.push({ ...newSerie })
+            newSerie.save()
+          } else {
+
+            const dateRef = new Date();
+            dateRef.setMilliseconds(0);
+            const newSerie = new this.ebModel({
+              deviceId: device?._id,
+              timestamp: new Date(),
+              metaField: {
+                byte1: lastDataOfEB?.Ch1_7,
+                byte2: lastDataOfEB?.Ch8_14,
+                byte3: lastDataOfEB?.Ch15_21,
               },
             });
             arrayOfTimeSerieseToSave.push({ ...newSerie })
