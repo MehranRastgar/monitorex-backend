@@ -72,7 +72,7 @@ export class UsersController {
 
   @Get(':id')
   @UseGuards(AbilityGuard)
-  @CheckAbility({ action: AbilityAction.Read, subject: 'user' })
+  @CheckAbility({ action: AbilityAction.Manage, subject: 'profile' })
   async findOne(@Param('id') id: string) {
     return await this.usersService.findOne(id);
   }
