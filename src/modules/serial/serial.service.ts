@@ -82,7 +82,7 @@ export class SerialService {
         if ((index + 1) % 2 !== 0) {
           if (numi === 200 && num[index + 1] === 0) {
             //is disconnect
-            checked.push(Number(200000));
+            checked.push(null);
           } else {
             if (num?.[index + 1] >= 240) {
               const Number1 =
