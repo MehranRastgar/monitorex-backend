@@ -37,15 +37,15 @@ async function bootstrap() {
 
   setInterval(() => {
     devicesService.updateDevicesOnCache();
-  }, 125000); // 2 minutes in milliseconds
+  }, ((Number(process.env.UPDATE_DEVIEC_ON_CACHE) * 1000) ?? 125000)); // 2 minutes in milliseconds
 
   devicesService.saveAllSensorsDataWithInterval();
 
   setInterval(() => {
     devicesService.saveAllSensorsDataWithInterval();
-  }, 60000);
+  }, ((Number(process.env.INTERVAL_SAVE_SENSORS) * 1000) ?? 60000));
   setInterval(() => {
     devicesService.saveAllEbDataWithInterval();
-  }, 60000);
+  }, ((Number(process.env.INTERVAL_SAVE_ELECTRICALS) * 1000) ?? 60000));
 }
 bootstrap();
